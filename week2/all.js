@@ -34,13 +34,13 @@ const renderData = function (data) {
             <td>
               <div class="custom-control custom-switch">
                 <input type="checkbox" ${
-                  next.active ? "checked" : ""
+                  next.is_enabled ? "checked" : ""
                 } class="custom-control-input" data-id="${
         next.id
       }" id="customSwitch-${next.id}">
                 <label class="activeProduct custom-control-label" for="customSwitch-${
                   next.id
-                }">${next.active ? "啟用" : "未啟用"}</label>
+                }">${next.is_enabled ? "啟用" : "未啟用"}</label>
               </div>
             </td>
             <td>
@@ -127,7 +127,7 @@ const addProuct = function (e) {
     return p;
   }, {});
   res.id = new Date().getTime();
-  res.active = false;
+  res.is_enabled = false;
   data.push(res);
   renderData(data);
 };
@@ -152,7 +152,7 @@ const productHandler = function (e) {
   if (nodeName === "INPUT") {
     const selectId = e.target.dataset.id;
     const index = data.findIndex((el) => el.id === selectId);
-    data[index].active = !data[index].active;
+    data[index].is_enabled = !data[index].is_enabled;
     // 刪除
   } else if (nodeName === "BUTTON") {
     // 注意: parseInt 因為是轉數字 而這裡回的ID是字串就變 NaN了
