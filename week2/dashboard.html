@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="../css/vendor/bootstrap.min.css">
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css' integrity='sha512-q3eWabyZPc1XTCmF+8/LuE1ozpg5xxn7iO89yfSOd5/oKvyqLngoNGsx8jq92Y8eXJ/IRxQbEC+FGSYxtk2oiw==' crossorigin='anonymous'/>
+  <style>
+
+  </style>
+</head>
+<body>
+  <div class="py-2 bg-light d-flex">
+    <h3 class="h5">後臺管理</h3>
+    <button class="btn btn-link ml-auto">登出</button>
+  </div>
+  <div class="wrap p-5">
+    <div class="card mb-3" style="width: 25rem;">
+      <div class="card-header">
+        新增產品
+      </div>
+      <div class="card-body">
+        <form id="productForm">
+          <div class="form-group mb-2">
+            <label for="title">
+              <span class="text-danger">*</span>
+              產品名稱
+            </label>
+            <input type="text" class="form-control" name="title" id="title" placeholder="請輸入產品名稱">
+          </div>
+          <div class="row mb-2">
+            <div class="form-group col-md-6">
+              <label for="price">
+                <span class="text-danger">*</span>
+                產品原價
+              </label>
+              <input type="number" class="form-control" name="price" id="price" placeholder="請輸入產品原價">
+            </div>
+            <div class="form-group col-md-6">
+              <label for="salePrice">產品售價</label>
+              <input type="number" class="form-control" name="salePrice" id="salePrice" placeholder="請輸入產品售價">
+            </div>
+          </div>
+          <div class="text-right">
+            <button type="submit" class="addProduct btn btn-primary"> 建立</button>
+          </div>
+  
+        </form>
+  
+      </div>
+  
+    </div>
+  
+    <div class="deleteProducts btn btn-danger btn-sm mb-3">清除全部</div>
+  
+    <table class="table mb-3 ">
+      <thead>
+        <tr>
+          <th scope="col">產品名稱</th>
+          <th scope="col">原價</th>
+          <th scope="col">售價</th>
+          <th scope="col">是否啟用</th>
+          <th scope="col">編輯</th>
+        </tr>
+      </thead>
+      <tbody class="productList">
+        <tr>
+          <td class="text-center" colspan="100">目前沒有產品唷!!!</td>
+        </tr>
+      </tbody>
+    </table>
+  
+    <p>目前有 <span class="leftProduct">0</span> 項商品</p>
+  </div>
+
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.9.1/axios.min.js' integrity='sha512-Xk3wWei2TGrsh9kDSBKUMIjw/86sLUvhtnv9f7fOuIwhhiUTKz8szkWkzHthrM5Bb3Bu9idSzkxOrkzhcneuiw==' crossorigin='anonymous'></script>
+  <script src='./all.js'></script>
+</body>
+</html>
