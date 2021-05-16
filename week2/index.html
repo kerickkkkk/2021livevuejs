@@ -35,52 +35,51 @@
   <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.9.1/axios.min.js' integrity='sha512-Xk3wWei2TGrsh9kDSBKUMIjw/86sLUvhtnv9f7fOuIwhhiUTKz8szkWkzHthrM5Bb3Bu9idSzkxOrkzhcneuiw==' crossorigin='anonymous'></script>
   <script>
     console.clear();
-
-    const url = "https://vue3-course-api.hexschool.io/";
-    const path = "pet";
-    
-    //客戶端畫面
-    const productsDOM = document.querySelector('.products > .row');
-
-    const renderProduct = function (data) {  
-      const str = data.products.reduce(function (p,n){
-        p += `<div class="col-md-4">
-                <div class="card">
-                  <img src="${n.imageUrl}" class="card-img-top" alt="${n}">
-                  <div class="card-body font-weight-bold">
-                    <h5 class="card-title h3 font-weight-bold">${n.title}</h5>
-                    <p class="card-text">${n.content}</p>
-                    <div class="d-flex justify-content-around align-items-center">
-                      <del class="text-muted ">NT${n.origin_price}</del>
-                      <div class="text-primary ">NT${n.price}</div>
-                      <a href="#" class="btn  btn-primary"><i class="fas fa-shopping-cart"></i></a>
+    const app = {
+      data:{
+        apiUrl : "https://vue3-course-api.hexschool.io",
+        apiPath : "pet"
+      },
+      renderProduct (data) {  
+        //客戶端畫面
+        const productsDOM = document.querySelector('.products > .row');
+        const str = data.products.reduce(function (p,n){
+          p += `<div class="col-md-4">
+                  <div class="card">
+                    <img src="${n.imageUrl}" class="card-img-top" alt="${n}">
+                    <div class="card-body font-weight-bold">
+                      <h5 class="card-title h3 font-weight-bold">${n.title}</h5>
+                      <p class="card-text">${n.content}</p>
+                      <div class="d-flex justify-content-around align-items-center">
+                        <del class="text-muted ">NT${n.origin_price}</del>
+                        <div class="text-primary ">NT${n.price}</div>
+                        <a href="#" class="btn  btn-primary"><i class="fas fa-shopping-cart"></i></a>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              `;
-        return p;
-      },'')
-      productsDOM.innerHTML = str
-    } 
+                `;
+          return p;
+        },'')
+        productsDOM.innerHTML = str
+      },
+      getProducts(){
+        // /api/:api_path/products
+        axios.get(`${this.data.apiUrl}/api/${this.data.apiPath}/products`)
+        .then((res) => {
 
+          if(res.length <=0) return false;
+          this.renderProduct(res.data)
 
-
-    const getProducts = function(){
-      // /api/:api_path/products
-      axios.get(`${url}api/${path}/products`)
-      .then((res) => {
-        console.log(res);
-        
-        if(res.length <=0) return false;
-        renderProduct(res.data)
-
-      })
+        })
+      },
+      mounted(){
+        this.getProducts()
+      }
     }
-    // 前台 取得所有可顯示產品
-    getProducts()
-    
 
+    app.mounted()
+    
   </script>
 </body>
 </html>

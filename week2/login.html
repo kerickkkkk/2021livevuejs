@@ -35,76 +35,65 @@
   <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.9.1/axios.min.js' integrity='sha512-Xk3wWei2TGrsh9kDSBKUMIjw/86sLUvhtnv9f7fOuIwhhiUTKz8szkWkzHthrM5Bb3Bu9idSzkxOrkzhcneuiw==' crossorigin='anonymous'></script>
   <script>
     console.clear();
+    const app ={
+      data:{
+        apiUrl : "https://vue3-course-api.hexschool.io",
+      },
+      // 判斷 是否已經有取得登入權限
+      checkLogin(){
+        // 取得寫入 cookie 
+        if(document.cookie !== ''){
+          // const token = document.cookie
+          //     .split('; ')
+          //     .find(row => row.startsWith('shop='))
+          //     .split('=')[1];
+          const token = document.cookie.replace(/(?:(?:^|.*;\s*)shop\s*=\s*([^;]*).*$)|^.*$/, '$1');
+          // https://github.com/axios/axios#global-axios-defaults
+    
+          axios.defaults.headers.common['Authorization'] = token;
+          axios.post(`${this.data.apiUrl}/api/user/check`)
+          .then((res)=>{
+            if(res.data.success){
+              alert('已有登入狀態~ 跳轉中~')
+              location.replace('./dashboard.html')
+            }else{
+              alert('沒有登入狀態請輸入帳密')
+            }
+          })
+        }else{
+          return false;
+        }
+      },
+      sendLogin(e){
+        e.preventDefault();
+            // DOM 
+        const username = document.querySelector('#username');
+        const password = document.querySelector('#password');
+        const user ={
+          username: username.value,
+          password: password.value
+        }
 
-    const url = "https://vue3-course-api.hexschool.io/";
-    const path = "pet";
-
-    // axios.get(`${url}api/${path}/products`).then((res) => {
-    //   console.log(res);
-    // });
-    // DOM 
-    const username = document.querySelector('#username');
-    const password = document.querySelector('#password');
-    const formLogin = document.querySelector('#formLogin');
-
-    // 判斷 是否已經有取得登入權限
-    const checkLogin = function(){
-      // 取得寫入 cookie 
-      if(document.cookie !== ''){
-        const token = document.cookie
-            .split('; ')
-            .find(row => row.startsWith('shop='))
-            .split('=')[1];
-        // https://github.com/axios/axios#global-axios-defaults
-  
-        axios.defaults.headers.common['Authorization'] = token;
-        console.log(token);
-        axios.post(`${url}api/user/check`)
-        .then((res)=>{
-          // [成功回應]:
-          //   {
-          //     "success": true
-          //   }
-          // [失敗回應]: 如用戶已登出狀況
-          //   {
-          //     "success": false,
-          //     "message": "請重新登入"
-          //   }
-          if(res.data.success){
-            alert('已有登入狀態~ 跳轉中~')
-            location.replace('./dashboard.html')
-          }else{
-            alert('沒有登入狀態請輸入帳密')
-          }
-        })
-      }else{
-        return false;
+        axios.post(`${this.data.apiUrl}/admin/signin`,user).then((res) => {
+            if(res.data.success){
+              const{expired,token} = res.data;
+              // 寫入
+              // document.cookie = doSomethingOnlyOnce=true; expires=Fri, 31 Dec 9999 23:59:59 GMT";
+              document.cookie = `shop=${token}; expires=${new Date(expired)}`;
+              location.replace('./dashboard.html')
+            }else{
+              alert(res.data.message)
+            }
+          });
+      },
+      mounted(){
+        const formLogin = document.querySelector('#formLogin');
+        // bind this 可以把內部的this轉掉
+        // 但要看一下原理看有啥方式可以改?
+        formLogin.addEventListener('submit',this.sendLogin.bind(this))
       }
     }
-
-    formLogin.addEventListener('submit',(e)=>{
-      e.preventDefault();
-      const user ={
-        username: username.value,
-        password: password.value
-      }
-
-      axios.post(`${url}admin/signin`,user).then((res) => {
-          if(res.data.success){
-            const{expired,token} = res.data;
-            // 寫入
-            // document.cookie = doSomethingOnlyOnce=true; expires=Fri, 31 Dec 9999 23:59:59 GMT";
-            document.cookie = `shop=${token}; expires=${new Date(expired)}`;
-            location.replace('./dashboard.html')
-          }else{
-            alert(res.data.message)
-          }
-        });
-
-
-    })
-
-    checkLogin()
+    app.mounted();
 
   </script>
 </body>
