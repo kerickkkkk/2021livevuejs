@@ -80,7 +80,6 @@ const getProducts = function(){
   axios.defaults.headers.common['Authorization'] = token;
   axios.get(`${url}api/${path}/admin/products`)
     .then((res)=>{
-      console.log(res);
       if(res.data.success){
         data = res.data.products
         renderData(data)
@@ -147,7 +146,7 @@ const productHandler = function (e) {
   // 阻擋不了 swith 同時選到 input label e.stopPropagation()
   // 分流 處理 input 和 button
   const nodeName = e.target.nodeName;
-  // console.log(e.target.nodeName)
+
   // 啟用
   if (nodeName === "INPUT") {
     const selectId = e.target.dataset.id;
@@ -198,6 +197,6 @@ deleteProductsBtn.addEventListener("click", deleteProducts);
 productList.addEventListener("click", productHandler);
 
 // ///////
-// init();
-getProducts()
+init();
+// getProducts()
 
