@@ -72,7 +72,7 @@ const renderData = function (data) {
 
 // 取得所有產品列表
 const getProducts = function(){
-  console.log(123);
+
   const token = document.cookie
         .split('; ')
         .find(row => row.startsWith('shop='))
@@ -83,7 +83,6 @@ const getProducts = function(){
       console.log(res);
       if(res.data.success){
         data = res.data.products
-        console.log(data);
         renderData(data)
       }else{
         alert(res.data.message)
@@ -151,14 +150,33 @@ const productHandler = function (e) {
   // console.log(e.target.nodeName)
   // 啟用
   if (nodeName === "INPUT") {
-    const selectId = parseInt(e.target.dataset.id);
+    const selectId = e.target.dataset.id;
     const index = data.findIndex((el) => el.id === selectId);
     data[index].active = !data[index].active;
     // 刪除
   } else if (nodeName === "BUTTON") {
-    const selectId = parseInt(e.target.dataset.id);
-    const index = data.findIndex((el) => el.id === selectId);
-    data.splice(index, 1);
+    // 注意: parseInt 因為是轉數字 而這裡回的ID是字串就變 NaN了
+    // const selectId = parseInt(e.target.dataset.id);
+    const selectId = e.target.dataset.id;
+    
+    // const index = data.findIndex((el) => el.id === selectId);
+    // data.splice(index, 1);
+    // call delete api
+    // /api/:api_path/admin/product/:product_id
+    const token = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('shop='))
+        .split('=')[1];
+    axios.defaults.headers.common['Authorization'] = token;
+    axios.delete(`${url}api/${path}/admin/product/${selectId}`)
+    .then((res)=>{
+      if(res.data.success){
+        alert(res.data.message)
+        getProducts()
+      }else{
+        alert(res.data.message)
+      }
+    })
   } else {
     // 不是的返回
     return false;
@@ -180,4 +198,6 @@ deleteProductsBtn.addEventListener("click", deleteProducts);
 productList.addEventListener("click", productHandler);
 
 // ///////
-init();
+// init();
+getProducts()
+
