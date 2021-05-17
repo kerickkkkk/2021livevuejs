@@ -41,6 +41,7 @@
       },
       // 判斷 是否已經有取得登入權限
       checkLogin(){
+
         // 取得寫入 cookie 
         if(document.cookie !== ''){
           // const token = document.cookie
@@ -58,6 +59,10 @@
               location.replace('./dashboard.html')
             }else{
               alert('沒有登入狀態請輸入帳密')
+              const formLogin = document.querySelector('#formLogin');
+              // bind this 可以把內部的this轉掉
+              // 但要看一下原理看有啥方式可以改?
+              formLogin.addEventListener('submit',this.sendLogin.bind(this))
             }
           })
         }else{
@@ -87,10 +92,7 @@
           });
       },
       mounted(){
-        const formLogin = document.querySelector('#formLogin');
-        // bind this 可以把內部的this轉掉
-        // 但要看一下原理看有啥方式可以改?
-        formLogin.addEventListener('submit',this.sendLogin.bind(this))
+        this.checkLogin()
       }
     }
     app.mounted();
