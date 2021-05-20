@@ -10,6 +10,8 @@ const app = {
     allInput.forEach((el)=> el.type !== 'checkbox' ? el.value = '' : el.checked = false)
     const allTextArea = document.querySelectorAll('#productForm textarea')
     allTextArea.forEach((el)=> el.value = '')
+    const imgUrlList = document.querySelectorAll('.imgUrl');
+    imgUrlList.forEach(el=>el.src = '')
   },
   renderData (products) {
     const productList = document.querySelector(".productList");
@@ -186,6 +188,10 @@ const app = {
 
 
   },
+  syncImgSrc(){
+    // 看結構有兩層就爬到了
+    if(this.value.trim() !=='') this.nextSibling.nextSibling.src = this.value;
+  },
   // deleteProducts () {
   //   if (this.data.products.length <= 0) {
   //     alert("產品列表無產品可清空, 請新增喔~~~~");
@@ -233,7 +239,8 @@ const app = {
     // const deleteProductsBtn = document.querySelector(".deleteProducts");
     const productForm = document.querySelector("#productForm");
     const productList = document.querySelector(".productList");
-    
+    const inputImgUrl = document.querySelectorAll('.inputImgUrl');
+    inputImgUrl.forEach(el=>el.addEventListener('change', this.syncImgSrc) )
     productForm.addEventListener("submit", this.addProduct.bind(this));
     // deleteProductsBtn.addEventListener("click", this.deleteProducts.bind(this));
     productList.addEventListener("click", this.productHandler.bind(this));
