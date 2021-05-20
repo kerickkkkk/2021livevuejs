@@ -208,10 +208,19 @@ const app = {
  
     // 啟用
     if (nodeName === "INPUT") {
-      // 還沒有接 api
       const selectId = e.target.dataset.id;
       const index = this.data.products.findIndex((el) => el.id === selectId);
       this.data.products[index].is_enabled = !this.data.products[index].is_enabled;
+      const selectIdEnable = e.target.dataset.id;
+      axios.put(`${this.data.apiUrl}/api/${this.data.apiPath}/admin/product/${selectIdEnable}`,{data:this.data.products[index]})
+      .then((res)=>{
+        if(res.data.success){
+          alert(res.data.message)
+          this.getProducts()
+        }else{
+          alert(res.data.message)
+        }
+      })
       // 刪除
     } else if (nodeName === "BUTTON") {
       const selectId = e.target.dataset.id;
