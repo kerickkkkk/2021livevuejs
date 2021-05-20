@@ -6,8 +6,10 @@ const app = {
     products:[],
   },
   clearAddProductForm () {
-    const inputMap = ["title", "price", "salePrice"];
-    inputMap.forEach((el) => (productForm[el].value = ""));
+    const allInput = document.querySelectorAll("#productForm input")
+    allInput.forEach((el)=> el.type !== 'checkbox' ? el.value = '' : el.checked = false)
+    const allTextArea = document.querySelectorAll('#productForm textarea')
+    allTextArea.forEach((el)=> el.value = '')
   },
   renderData (products) {
     const productList = document.querySelector(".productList");
@@ -57,12 +59,12 @@ const app = {
   
     // 給目前商品有幾項
     leftProduct.innerHTML = productsLen;
-    this.clearAddProductForm();
+
   },
   getProducts(){
 
     const token = document.cookie.replace(/(?:(?:^|.*;\s*)shop\s*=\s*([^;]*).*$)|^.*$/, '$1');
-
+    
     axios.defaults.headers.common['Authorization'] = token;
     axios.get(`${this.data.apiUrl}/api/${this.data.apiPath}/admin/products`)
       .then((res)=>{
@@ -77,7 +79,6 @@ const app = {
   },
   checkLogin (){
     // 取得寫入 cookie 
-      console.log('document.cookie', document.cookie !== '','token',document.cookie.replace(/(?:(?:^|.*;\s*)shop\s*=\s*([^;]*).*$)|^.*$/, '$1'));
     if(document.cookie !== ''){
       const token = document.cookie.replace(/(?:(?:^|.*;\s*)shop\s*=\s*([^;]*).*$)|^.*$/, '$1');
       axios.defaults.headers.common['Authorization'] = token;
@@ -95,6 +96,95 @@ const app = {
       location.replace('./login.html')
       return false;
     }
+  },
+  addProduct (e) {
+    e.preventDefault();
+    //  title(String)、category(String)、unit(String)、origin_price(Number)、price(Number) 為必填欄位 
+
+    const inputMap = [
+      {name:'title',columnName:'標題',type:'String'},
+      {name:'category',columnName:'分類',type:'String'},
+      {name:'unit',columnName:'單位',type:'String'},
+      {name:'origin_price',columnName:'原價',type:'Number'},
+      {name:'price',columnName:'售價',type:'Number'}];
+    
+    // 未輸入數值都是空字串
+    // 空值返回
+    const checkEmptyArr =  inputMap.filter(el => "" === (e.target[el.name].value) )
+    if(checkEmptyArr.length > 0){
+      const emptyMsg = checkEmptyArr.reduce((p,n)=>{
+        p += `${n.columnName} `
+        return p 
+      },'以下欄位必填: ')
+      alert(emptyMsg)
+      return false;
+    }
+    const imgUrlList = document.querySelectorAll('.imgUrl');
+    // 直接寫上去綁定
+
+    let product = {
+      data:{
+        "title":              e.target["title"].value, 
+        "category":           e.target["category"].value,
+        // input 過來都是 string
+        "origin_price":       parseInt(e.target["origin_price"].value),
+        "price":              parseInt(e.target["price"].value),
+        "unit":               e.target["unit"].value,
+        "description":        e.target["description"].value,
+        "content":            e.target["content"].value,
+        // 要用 checked 才可以
+        "is_enabled":         e.target["is_enabled"].checked ,
+        "imageUrl" :          imgUrlList[0].getAttribute('src'),
+        "imagesUrl": [
+          imgUrlList[1].getAttribute('src'),
+          imgUrlList[2].getAttribute('src'),
+          imgUrlList[3].getAttribute('src'),
+          imgUrlList[4].getAttribute('src'),
+          imgUrlList[5].getAttribute('src')
+        ]
+      }
+    }
+    // imgUrlList.forEach((el,i)=> {
+    //   if(i>0){
+    //     product.data.imagesUrl.push(el.getAttribute('src'))
+    //   }else{
+    //     product.data.imageUrl = el.getAttribute('src')
+    //   }
+    // })
+
+    // {
+    //   "data": {
+    //     "title": "[賣]動物園造型衣服3", 
+    //     "category": "衣服2",
+    //     "origin_price": 100,
+    //     "price": 300,
+    //     "unit": "個",
+    //     "description": "Sit down please 名設計師設計",
+    //     "content": "這是內容",
+    //     "is_enabled": 1,
+    //     "imageUrl" : "主圖網址",
+    //     "imagesUrl": [
+    //       "圖片網址一",
+    //       "圖片網址二",
+    //       "圖片網址三",
+    //       "圖片網址四",
+    //       "圖片網址五"
+    //     ]
+    //   }
+    // }
+
+    axios.post(`${this.data.apiUrl}/api/${this.data.apiPath}/admin/product/`,product)
+    .then((res)=>{
+      if(res.data.success){
+        alert(res.data.message)
+        this.clearAddProductForm();
+        this.getProducts()
+      }else{
+        alert(res.data.message)
+      }
+    })
+
+
   },
   // deleteProducts () {
   //   if (this.data.products.length <= 0) {
@@ -136,18 +226,18 @@ const app = {
     // this.renderData(data);
   },
   init(){
+    this.checkLogin()
     // this.getProducts()
     
     // 初始化綁定
     // const deleteProductsBtn = document.querySelector(".deleteProducts");
-    // const productForm = document.querySelector("#productForm");
+    const productForm = document.querySelector("#productForm");
     const productList = document.querySelector(".productList");
     
-    // productForm.addEventListener("submit", addProuct);
+    productForm.addEventListener("submit", this.addProduct.bind(this));
     // deleteProductsBtn.addEventListener("click", this.deleteProducts.bind(this));
     productList.addEventListener("click", this.productHandler.bind(this));
 
-    this.checkLogin()
   },
   mounted(){
     this.init()
