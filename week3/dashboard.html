@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="../css/vendor/bootstrap.min.css">
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css' integrity='sha512-q3eWabyZPc1XTCmF+8/LuE1ozpg5xxn7iO89yfSOd5/oKvyqLngoNGsx8jq92Y8eXJ/IRxQbEC+FGSYxtk2oiw==' crossorigin='anonymous'/>
+</head>
+<body>
+  <div id="app">
+    <div class="py-2 bg-light d-flex">
+      <h3 class="h5">後臺管理</h3>
+      <button class="btn btn-link ml-auto">登出</button>
+    </div>
+    <div class="wrap p-5">
+      <div class="card mb-3">
+        <div class="card-header">
+          新增產品
+        </div>
+        <div class="card-body">
+          <div class="container-fluid">
+            <form id="productForm">
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="form-group my-3">
+                    <label for="#mainImg">輸入主圖網址</label>
+                    <input type="text" class="form-control mb-3 inputImgUrl" id="mainImg" placeholder="輸入主圖網址">
+                    <img class="img-fluid imgUrl" src="" alt="圖片">
+                  </div>
+                  <div class="form-row">
+                    <div class="col-md-6 mb-5">
+                      <label for="#image1">輸入圖片網址 1</label>
+                      <input type="text" id="image1" class="form-control mb-3 inputImgUrl" placeholder="輸入圖片網址 1">
+                      <img class="img-fluid imgUrl" src="" alt="圖片">
+                    </div>
+                    <div class="col-md-6 mb-5">
+                    <label for="#image2">輸入圖片網址 2</label>
+                      <input type="text" id="image2" class="form-control mb-3 inputImgUrl" placeholder="輸入圖片網址 2">
+                      <img class="img-fluid imgUrl" src="" alt="圖片">
+                    </div>
+                    <div class="col-md-6 mb-5">
+                      <label for="#image3">輸入圖片網址 3</label>
+                      <input type="text" id="image3" class="form-control mb-3 inputImgUrl" placeholder="輸入圖片網址 3">
+                      <img class="img-fluid imgUrl" src="" alt="圖片">
+                    </div>
+                    <div class="col-md-6 mb-5">
+                      <label for="#image4">輸入圖片網址 4</label>
+                      <input type="text" id="image4" class="form-control mb-3 inputImgUrl" placeholder="輸入圖片網址 4">
+                      <img class="img-fluid imgUrl" src="" alt="圖片">
+                    </div>
+                    <div class="col-md-6 mb-5">
+                      <label for="#image5">輸入圖片網址 5</label>
+                      <input type="text" id="image5" class="form-control mb-3 inputImgUrl" placeholder="輸入圖片網址 5">
+                      <img class="img-fluid imgUrl" src="" alt="圖片">
+                    </div>
+                
+                  </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="form-group mb-2">
+                      <!-- title(String)、category(String)、unit(String)、origin_price(Number)、price(Number) 為必填欄位 -->
+                      <label for="title">
+                        <span class="text-danger">*</span>
+                        標題
+                      </label>
+                      <input type="text" class="form-control" name="title" id="title" placeholder="標題">
+                    </div>
+                    <div class="form-row mb-2">
+                      <div class="form-group col-md-6">
+                        <label for="category">
+                          <span class="text-danger">*</span>
+                          分類
+                        </label>
+                        <input type="text" class="form-control" name="category" id="category" placeholder="分類">
+                      </div>
+                      <div class="form-group col-md-6">
+                        <label for="unit">
+                          <span class="text-danger">*</span>
+                          單位
+                        </label>
+                        <input type="text" class="form-control" name="unit" id="unit" placeholder="單位">
+                      </div>
+                    </div>
+                    <div class="form-row mb-2">
+                      <div class="form-group col-md-6">
+                        <label for="price">
+                          <span class="text-danger">*</span>
+                          原價
+                        </label>
+                        <input type="number" class="form-control" name="origin_price" id="price" placeholder="原價">
+                      </div>
+                      <div class="form-group col-md-6">
+                        <span class="text-danger">*</span>
+                        <label for="salePrice">售價</label>
+                        <input type="number" class="form-control" name="salePrice" id="salePrice" placeholder="售價">
+                      </div>
+                    </div>
+                    <div class="form-group mb-2">
+                      <label for="description">
+                        描述
+                      </label>
+                      <textarea class="form-control" name="description" id="description" placeholder="描述"></textarea>
+                    </div>
+                    <div class="form-group mb-2">
+                      <label for="content">
+                        說明
+                      </label>
+                      <textarea class="form-control" name="content" id="content" placeholder="說明"></textarea>
+                    </div>
+                    <div class="d-flex">
+                      <div class="form-group form-check">
+                        <input type="checkbox" name="is_enabled" class="form-check-input" id="productFormChecked">
+                        <label class="form-check-label" for="productFormChecked">是否啟用</label>
+                      </div>
+                      <button type="submit" class="addProduct btn btn-sm btn-primary ml-auto"> 建立</button>
+                    </div>
+                </div>
+      
+              </div>
+            </form>
+  
+          </div>
+    
+        </div>
+    
+      </div>
+    
+      <div class="deleteProducts btn btn-danger btn-sm mb-3">清除全部</div>
+      
+      <table class="table mb-3 ">
+        <thead>
+          <tr>
+            <th scope="col">產品名稱</th>
+            <th scope="col">原價</th>
+            <th scope="col">售價</th>
+            <th scope="col">是否啟用</th>
+            <th scope="col">編輯</th>
+          </tr>
+        </thead>
+        <tbody class="productList">
+          <tr>
+            <td class="text-center" colspan="100">目前沒有產品唷!!!</td>
+          </tr>
+        </tbody>
+      </table>
+    
+      <p>目前有 <span class="leftProduct">0</span> 項商品</p>
+    </div>
+  </div>
+  <script src="https://unpkg.com/vue@next"></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.9.1/axios.min.js' integrity='sha512-Xk3wWei2TGrsh9kDSBKUMIjw/86sLUvhtnv9f7fOuIwhhiUTKz8szkWkzHthrM5Bb3Bu9idSzkxOrkzhcneuiw==' crossorigin='anonymous'></script>
+  <script>
+    const app = {
+      data(){
+        return {
+          apiUrl: "https://vue3-course-api.hexschool.io",
+          apiPath: "pet",
+          user :{
+            username: '',
+            password: ''
+          },
+          products:[]
+        }
+      },
+      methods:{
+        checkLogin(){
+          if(document.cookie !== ''){
+            const token = document.cookie.replace(/(?:(?:^|.*;\s*)shop\s*=\s*([^;]*).*$)|^.*$/, '$1');
+            axios.defaults.headers.common['Authorization'] = token;
+            axios.post(`${this.apiUrl}/api/user/check`)
+            .then((res)=>{
+              if(!res.data.success){
+                alert('沒有登入狀態 將導回登入頁面')
+                location.replace('./login.html')
+              }
+              this.getProducts()
+            })
+          }else{
+            return false;
+          }
+        },
+        //　取得產品
+        getProducts(){
+          const token = document.cookie.replace(/(?:(?:^|.*;\s*)shop\s*=\s*([^;]*).*$)|^.*$/, '$1');
+          axios.defaults.headers.common['Authorization'] = token;
+          axios.get(`${this.apiUrl}/api/${this.apiPath}/admin/products`)
+            .then((res)=>{
+              if(res.data.success){
+                this.products = res.data.products;
+              }else{
+                alert(res.data.message)
+              }
+            })
+        },
+      },
+      created(){
+        // this.checkLogin()
+        this.getProducts();
+      }
+
+    }
+    Vue.createApp(app).mount('#app');
+  </script>
+</body>
+</html>
