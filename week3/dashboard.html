@@ -147,15 +147,17 @@
               <td>{{product.price}}</td>
               <td>
                 <div class="custom-control custom-switch">
-                  <input type="checkbox" :checked="product.is_enabled" class="custom-control-input"
-                    id=`customSwitch-${product.id}`>
-                  <label class="activeProduct custom-control-label" for="`customSwitch-${
-                    product.id
-                  }`">{{product.is_enabled ? "啟用" : "未啟用"}}</label>
+                  <!-- 注意這邊需要用 checked = =... -->
+                  <input 
+                    :checked = "product.is_enabled"
+                    @change = "enableProduct(product.id)"
+                    type="checkbox"  class="custom-control-input"
+                    :id=`customSwitch${product.id}`>
+                  <label class="custom-control-label" :for="`customSwitch${ product.id }`">{{product.is_enabled ? "啟用" : "未啟用"}}</label>
                 </div>
               </td>
               <td>
-                <button class="deleteProduct btn btn-danger btn-sm">刪除</button>
+                <button @click="deleteProduct(product.id)" class="btn btn-danger btn-sm">刪除</button>
               </td>
             </tr>
           </template>
@@ -213,6 +215,31 @@
               }
             })
         },
+        deleteProduct(selectId){
+          // const selectId = e.target.dataset.id;
+          axios.delete(`${this.apiUrl}/api/${this.apiPath}/admin/product/${selectId}`)
+          .then((res)=>{
+            if(res.data.success){
+              alert(res.data.message)
+              this.getProducts()
+            }else{
+              alert(res.data.message)
+            }
+          })
+        },
+        enableProduct(selectId){
+          const index = this.products.findIndex((product) => product.id === selectId);
+          this.products[index].is_enabled = !this.products[index].is_enabled;
+          axios.put(`${this.apiUrl}/api/${this.apiPath}/admin/product/${selectId}`,{data:this.products[index]})
+          .then((res)=>{
+            if(res.data.success){
+              alert(res.data.message)
+              this.getProducts()
+            }else{
+              alert(res.data.message)
+            }
+          })
+        }
       },
       created(){
         // this.checkLogin()
