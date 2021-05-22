@@ -126,25 +126,27 @@
         </div>
     
       </div>
-    
-      <div class="deleteProducts btn btn-danger btn-sm mb-3">清除全部</div>
-      
-      <table class="table mb-3 ">
+      <div class="text-right">
+        <button type="button" class="btn btn-sm btn-primary my-3">建立新產品</button>
+      </div>      
+      <table class="table mb-3 table-sm">
         <thead>
           <tr>
-            <th scope="col">產品名稱</th>
-            <th scope="col">原價</th>
-            <th scope="col">售價</th>
-            <th scope="col">是否啟用</th>
-            <th scope="col">編輯</th>
+            <th width="150">分類</th>
+            <th>產品名稱</th>
+            <th width="100">原價</th>
+            <th width="100">售價</th>
+            <th width="150">是否啟用</th>
+            <th width="150">編輯</th>
           </tr>
         </thead>
         <tbody class="productList">
           <template v-if="products.length > 0">
             <tr v-for="product in products" :key="product.id">
+              <td>{{product.category}}</td>
               <td>{{product.title}}</td>
-              <td>{{product.origin_price}}</td>
-              <td>{{product.price}}</td>
+              <td class="text-right">{{product.origin_price}}</td>
+              <td class="text-right">{{product.price}}</td>
               <td>
                 <div class="custom-control custom-switch">
                   <!-- 注意這邊需要用 checked = =... -->
@@ -153,11 +155,15 @@
                     @change = "enableProduct(product.id)"
                     type="checkbox"  class="custom-control-input"
                     :id=`customSwitch${product.id}`>
-                  <label class="custom-control-label" :for="`customSwitch${ product.id }`">{{product.is_enabled ? "啟用" : "未啟用"}}</label>
+                  <label class="custom-control-label" :class="{'text-success': product.is_enabled }" :for="`customSwitch${ product.id }`">{{product.is_enabled ? "啟用" : "未啟用"}}</label>
                 </div>
               </td>
               <td>
-                <button @click="deleteProduct(product.id)" class="btn btn-danger btn-sm">刪除</button>
+                <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
+                  <button type="button" @click="deleteProduct(product.id)" class="btn btn-outline-primary">編輯</button>
+                  <button type="button" @click="deleteProduct(product.id)" class="btn btn-outline-danger">刪除</button>
+
+                </div>
               </td>
             </tr>
           </template>
@@ -216,7 +222,6 @@
             })
         },
         deleteProduct(selectId){
-          // const selectId = e.target.dataset.id;
           axios.delete(`${this.apiUrl}/api/${this.apiPath}/admin/product/${selectId}`)
           .then((res)=>{
             if(res.data.success){
