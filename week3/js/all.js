@@ -1,0 +1,156 @@
+console.clear();
+
+const app = {
+  data(){
+    return {
+      apiUrl: "https://vue3-course-api.hexschool.io",
+      apiPath: "pet",
+      user :{
+        username: '',
+        password: ''
+      },
+      products:[],
+      tempProduct:{},
+      newTempImageUrl:'',
+      modalType:'',
+    }
+  },
+  methods:{
+    checkLogin(){
+      if(document.cookie !== ''){
+        const token = document.cookie.replace(/(?:(?:^|.*;\s*)shop\s*=\s*([^;]*).*$)|^.*$/, '$1');
+        axios.defaults.headers.common['Authorization'] = token;
+        axios.post(`${this.apiUrl}/api/user/check`)
+        .then((res)=>{
+          if(!res.data.success){
+            alert('沒有登入狀態 將導回登入頁面')
+            location.replace('./login.html')
+          }
+          this.getProducts()
+        })
+      }else{
+        return false;
+      }
+    },
+    //　取得產品
+    getProducts(){
+      const token = document.cookie.replace(/(?:(?:^|.*;\s*)shop\s*=\s*([^;]*).*$)|^.*$/, '$1');
+      axios.defaults.headers.common['Authorization'] = token;
+      axios.get(`${this.apiUrl}/api/${this.apiPath}/admin/products`)
+        .then((res)=>{
+          if(res.data.success){
+            this.products = res.data.products;
+            // this.tempProduct = this.products[0];
+          }else{
+            alert(res.data.message)
+          }
+        })
+    },
+    deleteProduct(selectId){
+      axios.delete(`${this.apiUrl}/api/${this.apiPath}/admin/product/${selectId}`)
+      .then((res)=>{
+        if(res.data.success){
+          alert(res.data.message)
+          this.getProducts()
+        }else{
+          alert(res.data.message)
+        }
+      })
+    },
+    enableProduct(selectId){
+      const index = this.products.findIndex((product) => product.id === selectId);
+      this.products[index].is_enabled = !this.products[index].is_enabled;
+      axios.put(`${this.apiUrl}/api/${this.apiPath}/admin/product/${selectId}`,{data:this.products[index]})
+      .then((res)=>{
+        if(res.data.success){
+          alert(res.data.message)
+          this.getProducts()
+        }else{
+          alert(res.data.message)
+        }
+      })
+    },
+    cancelModal(){
+      $('#addEditModal').modal('hide')
+      this.tempProduct={};
+      this.newTempImageUrl = '';
+      this.modalType = ''
+    },
+    sendProduct(){
+      //檢查必填欄位
+      // if(!this.checkMustFill()) return false
+      const inputMap = [
+        {name:'title',columnName:'標題'},
+        {name:'category',columnName:'分類'},
+        {name:'unit',columnName:'單位'},
+        {name:'origin_price',columnName:'原價'},
+        {name:'price',columnName:'售價'}
+      ];
+      
+      // 未輸入數值都是空字串
+      // 空值返回
+      // 因為可能 tempProduct 內為空直接改成濾 falsy 的值
+      const checkEmptyArr =  inputMap.filter(el =>  !this.tempProduct[el.name] )
+      if(checkEmptyArr.length > 0){
+        const emptyMsg = checkEmptyArr.reduce((p,n)=>{
+          p += `${n.columnName} `
+          return p 
+        },'以下欄位必填: ')
+        alert(emptyMsg)
+        return false;
+      }
+      const url = {
+        add : `${this.apiUrl}/api/${this.apiPath}/admin/product/` ,
+        edit : `${this.apiUrl}/api/${this.apiPath}/admin/product/${this.tempProduct.id}` 
+      }
+      const appMethod={
+        add: 'post',
+        edit: 'put'
+      }
+      // pass
+      axios[appMethod[this.modalType]]( url[this.modalType] ,{data: this.tempProduct})
+      .then((res)=>{
+        if(res.data.success){
+          alert(res.data.message)
+          this.cancelModal()
+          this.getProducts()
+        }else{
+          alert(res.data.message)
+        }
+      })
+    },
+    // 新增 編輯調控
+    modalHandler(type , product ){
+      if(type === 'add'){
+        $('#addEditModal').modal('show')
+        this.modalType = type
+      }else if(type === 'edit'){
+          //檢查必填欄位
+          $('#addEditModal').modal('show')
+          this.tempProduct = {...product}
+          this.modalType = type
+      }else{
+        console.log('沒有這個type');
+      }
+    },
+    addTempImage(){
+      if(this.newTempImageUrl !== '') {
+        // 為空要先初始化
+        if(!this.tempProduct.imagesUrl){
+          this.tempProduct.imagesUrl = []
+        }
+        this.tempProduct.imagesUrl.push(this.newTempImageUrl)
+        this.newTempImageUrl = ''
+      }else{
+        alert('請輸入新增圖片網址')
+      }
+      
+    },
+  },
+  created(){
+    // this.checkLogin()
+    this.getProducts();
+  }
+
+}
+Vue.createApp(app).mount('#app');
