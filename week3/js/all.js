@@ -27,6 +27,8 @@ const app = {
             location.replace('./index.html')
           }
           this.getProducts()
+        }).catch((error)=>{
+          console.log(error);
         })
       }else{
         return false;
@@ -44,6 +46,8 @@ const app = {
           }else{
             alert(res.data.message)
           }
+        }).catch((error)=>{
+          console.log(error);
         })
     },
     deleteProduct(){
@@ -58,6 +62,8 @@ const app = {
         }else{
           alert(res.data.message)
         }
+      }).catch((error)=>{
+        console.log(error);
       })
     },
     enableProduct(selectId){
@@ -71,6 +77,8 @@ const app = {
         }else{
           alert(res.data.message)
         }
+      }).catch((error)=>{
+        console.log(error);
       })
     },
     resetTempProduct(){
@@ -127,6 +135,8 @@ const app = {
         }else{
           alert(res.data.message)
         }
+      }).catch((error)=>{
+        console.log(error);
       })
     },
     // 新增 編輯調控

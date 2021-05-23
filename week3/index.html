@@ -53,7 +53,9 @@
               }else{
                 alert(res.data.message)
               }
-            });
+            }).catch((error)=>{
+              console.log(error);
+            })
         },
         checklogin(){
           if(document.cookie !== ''){
@@ -67,6 +69,8 @@
               }else{
                 alert('沒有登入狀態請輸入帳密')
               }
+            }).catch((error)=>{
+              console.log(error);
             })
           }else{
             return false;
