@@ -31,6 +31,8 @@ const app = {
           console.log(error);
         })
       }else{
+        alert('沒有登入狀態 將導回登入頁面')
+        location.replace('./index.html')
         return false;
       }
     },
