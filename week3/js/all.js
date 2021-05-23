@@ -46,12 +46,15 @@ const app = {
           }
         })
     },
-    deleteProduct(selectId){
+    deleteProduct(){
+      // 因為改用 modal 傳入 id 改從 tempProduct 取得
+      const selectId = this.tempProduct.id
       axios.delete(`${this.apiUrl}/api/${this.apiPath}/admin/product/${selectId}`)
       .then((res)=>{
         if(res.data.success){
           alert(res.data.message)
           this.getProducts()
+          this.cancelModal()
         }else{
           alert(res.data.message)
         }
@@ -78,7 +81,10 @@ const app = {
       this.newTempImageUrl = '';
     },
     cancelModal(){
-      $('#addEditModal').modal('hide')
+      const currentModal = (this.modalType === 'add' || this.modalType === 'edit') 
+        ? 'addEdit' : 'delete';
+      $(`#${currentModal}Modal`).modal('hide')
+      this.resetTempProduct()
     },
     sendProduct(){
       //檢查必填欄位
@@ -117,7 +123,6 @@ const app = {
         if(res.data.success){
           alert(res.data.message)
           this.cancelModal()
-          this.resetTempProduct()
           this.getProducts()
         }else{
           alert(res.data.message)
@@ -130,10 +135,13 @@ const app = {
         $('#addEditModal').modal('show')
         this.modalType = type
       }else if(type === 'edit'){
-          //檢查必填欄位
-          $('#addEditModal').modal('show')
-          this.tempProduct = {...product}
-          this.modalType = type
+        $('#addEditModal').modal('show')
+        this.tempProduct = {...product}
+        this.modalType = type
+      }else if(type === 'delete'){
+        $('#deleteModal').modal('show')
+        this.tempProduct = {...product}
+        this.modalType = type
       }else{
         console.log('沒有這個type');
       }

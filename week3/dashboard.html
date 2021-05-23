@@ -50,7 +50,7 @@
               <td>
                 <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
                   <button type="button" @click="modalHandler('edit', product)" class="btn btn-outline-primary">編輯</button>
-                  <button type="button" @click="deleteProduct(product.id)" class="btn btn-outline-danger">刪除</button>
+                  <button type="button" @click="modalHandler('delete', product)" class="btn btn-outline-danger">刪除</button>
                 </div>
               </td>
             </tr>
@@ -178,6 +178,27 @@
           <div class="modal-footer">
             <button @click="cancelModal" type="button" class="btn btn-sm btn-secondary">取消</button>
             <button @click="sendProduct" type="button" class="btn btn-sm btn-primary">確定</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- modal 刪除 -->
+    <div id="deleteModal" class="modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header bg-danger">
+            <h5 class="modal-title">刪除產品</h5>
+            <button @click="cancelModal" type="button" class="close" >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <h3 class="h3">是否要<span class="strong">刪除</span>商品??</h3>
+          </div>
+          <div class="modal-footer">
+            <button @click="deleteProduct" type="button" class="btn btn-danger">確定刪除</button>
+            <button @click="cancelModal" type="button" class="btn btn-sm btn-secondary">取消</button>
           </div>
         </div>
       </div>
