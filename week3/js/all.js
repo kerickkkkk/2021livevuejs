@@ -24,7 +24,7 @@ const app = {
         .then((res)=>{
           if(!res.data.success){
             alert('沒有登入狀態 將導回登入頁面')
-            location.replace('./login.html')
+            location.replace('./index.html')
           }
           this.getProducts()
         })
@@ -34,8 +34,8 @@ const app = {
     },
     //　取得產品
     getProducts(){
-      const token = document.cookie.replace(/(?:(?:^|.*;\s*)shop\s*=\s*([^;]*).*$)|^.*$/, '$1');
-      axios.defaults.headers.common['Authorization'] = token;
+      // const token = document.cookie.replace(/(?:(?:^|.*;\s*)shop\s*=\s*([^;]*).*$)|^.*$/, '$1');
+      // axios.defaults.headers.common['Authorization'] = token;
       axios.get(`${this.apiUrl}/api/${this.apiPath}/admin/products`)
         .then((res)=>{
           if(res.data.success){
@@ -131,13 +131,13 @@ const app = {
     },
     // 新增 編輯調控
     modalHandler(type , product ){
-      if(type === 'add'){
+      if(type === 'add' || type === 'edit'){
         $('#addEditModal').modal('show')
         this.modalType = type
-      }else if(type === 'edit'){
-        $('#addEditModal').modal('show')
-        this.tempProduct = {...product}
-        this.modalType = type
+        
+        if(type === 'edit') {
+          this.tempProduct = {...product}
+        }
       }else if(type === 'delete'){
         $('#deleteModal').modal('show')
         this.tempProduct = {...product}
@@ -161,8 +161,8 @@ const app = {
     },
   },
   created(){
-    // this.checkLogin()
-    this.getProducts();
+    this.checkLogin()
+    // this.getProducts();
   }
 
 }
