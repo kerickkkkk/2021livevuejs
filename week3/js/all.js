@@ -70,11 +70,15 @@ const app = {
         }
       })
     },
-    cancelModal(){
-      $('#addEditModal').modal('hide')
+    resetTempProduct(){
+      // 控制新增編輯狀態用
+      this.modalType = ''
+      // 新增編輯暫存
       this.tempProduct={};
       this.newTempImageUrl = '';
-      this.modalType = ''
+    },
+    cancelModal(){
+      $('#addEditModal').modal('hide')
     },
     sendProduct(){
       //檢查必填欄位
@@ -113,6 +117,7 @@ const app = {
         if(res.data.success){
           alert(res.data.message)
           this.cancelModal()
+          this.resetTempProduct()
           this.getProducts()
         }else{
           alert(res.data.message)
