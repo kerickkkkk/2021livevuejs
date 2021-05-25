@@ -13,6 +13,13 @@ const app = {
       tempProduct:{},
       newTempImageUrl:'',
       modalType:'',
+      pagination:{
+        category: null,
+        current_page: null,
+        has_next: false,
+        has_pre: false,
+        total_pages: null,
+      }
     }
   },
   methods:{
@@ -37,13 +44,15 @@ const app = {
       }
     },
     //　取得產品
-    getProducts(){
+    getProducts(page = 1){
       // const token = document.cookie.replace(/(?:(?:^|.*;\s*)shop\s*=\s*([^;]*).*$)|^.*$/, '$1');
       // axios.defaults.headers.common['Authorization'] = token;
-      axios.get(`${this.apiUrl}/api/${this.apiPath}/admin/products`)
+      axios.get(`${this.apiUrl}/api/${this.apiPath}/admin/products?page=${page}`)
         .then((res)=>{
           if(res.data.success){
-            this.products = res.data.products;
+            const {products, pagination} = res.data
+            this.products = products;
+            this.pagination = pagination
             // this.tempProduct = this.products[0];
           }else{
             alert(res.data.message)
@@ -178,4 +187,29 @@ const app = {
   }
 
 }
-Vue.createApp(app).mount('#app');
+
+Vue.createApp(app)
+  .component('pagination',{
+      template: '#pagination',
+      props:{
+        currentPage:{
+          type: Number,
+        },
+        hasNext:{
+          type: Boolean,
+        },
+        hasPre:{
+          type: Boolean,
+        },
+        totalPages:{
+          type: Number,
+        },
+      },
+      methods:{
+        getProducts(page){
+          this.$emit('e_getProducts',page)
+        }
+      }
+    })
+  .mount('#app');
+
