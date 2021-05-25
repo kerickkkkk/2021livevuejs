@@ -67,10 +67,11 @@
         // /api/:api_path/products
         axios.get(`${this.data.apiUrl}/api/${this.data.apiPath}/products`)
         .then((res) => {
-
-          if(res.length <=0) return false;
-          this.renderProduct(res.data)
-
+          if(res.data.success){
+              this.renderProduct(res.data)
+            }else{
+              alert(res.data.message)
+          }
         })
       },
       mounted(){
