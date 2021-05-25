@@ -66,6 +66,8 @@
             }
           })
         }else{
+          const formLogin = document.querySelector('#formLogin');
+          formLogin.addEventListener('submit',this.sendLogin.bind(this))
           return false;
         }
       },
