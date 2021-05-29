@@ -74,6 +74,49 @@
     </div>
 
     <!-- modal 新增 編輯 -->
+
+    <add-edit-modal
+      :api-url = 'apiUrl' 
+      :api-path='apiPath'
+      :modal-type='modalType'
+      :temp-product = 'tempProduct' 
+      @e-get-products = "getProducts"
+      @e-cancel-modal = 'cancelModal'
+      ></add-edit-modal>
+    <!-- modal 刪除 -->
+    <delete-modal 
+      :api-url = 'apiUrl' 
+      :api-path='apiPath'
+      :temp-product = 'tempProduct' 
+      @e-get-products = "getProducts"
+      @e-cancel-modal = 'cancelModal'
+      ></delete-modal>
+    <!-- modal upload img -->
+    <upload-img-modal :api-url = 'apiUrl' :api-path='apiPath'></upload-img-modal>
+
+  </div>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js' integrity='sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==' crossorigin='anonymous'></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/vue@next"></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.9.1/axios.min.js' integrity='sha512-Xk3wWei2TGrsh9kDSBKUMIjw/86sLUvhtnv9f7fOuIwhhiUTKz8szkWkzHthrM5Bb3Bu9idSzkxOrkzhcneuiw==' crossorigin='anonymous'></script>
+  <!-- 分頁  template -->
+  <script type="x-template" id="pagination">
+    <nav>
+      <ul class="pagination">
+        <li @click="getProducts(currentPage-1)" class="page-item " :class="{disabled: !hasPre}">
+          <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+        </li>
+        <li @click="getProducts(page)" v-for="page in totalPages" :class="{active: page === currentPage}" :key="page" class="page-item">
+          <a class="page-link" href="#">{{page}}</a>
+        </li>
+        <li @click="getProducts(currentPage+1)" class="page-item"  :class="{disabled: !hasNext}">
+          <a class="page-link" href="#">Next</a>
+        </li>
+      </ul>
+    </nav>
+  </script>
+  <!-- modal 新增 編輯 -->
+  <script type="x-template" id="addEditModalCMP">
     <div id="addEditModal" class="modal" tabindex="-1" role="dialog">
       <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -192,7 +235,9 @@
       </div>
     </div>
 
-    <!-- modal 刪除 -->
+  </script>
+  <!-- 刪除 Modal template -->
+  <script type="x-template" id="deleteModalCMP">
     <div id="deleteModal" class="modal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -212,30 +257,8 @@
         </div>
       </div>
     </div>
-    <!-- modal upload img -->
-    <upload-img-modal :api-url = 'apiUrl' :api-path='apiPath'></upload-img-modal>
-
-  </div>
-  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js' integrity='sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==' crossorigin='anonymous'></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/vue@next"></script>
-  <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.9.1/axios.min.js' integrity='sha512-Xk3wWei2TGrsh9kDSBKUMIjw/86sLUvhtnv9f7fOuIwhhiUTKz8szkWkzHthrM5Bb3Bu9idSzkxOrkzhcneuiw==' crossorigin='anonymous'></script>
-  <script type="x-template" id="pagination">
-    <nav>
-      <ul class="pagination">
-        <li @click="getProducts(currentPage-1)" class="page-item " :class="{disabled: !hasPre}">
-          <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-        </li>
-        <li @click="getProducts(page)" v-for="page in totalPages" :class="{active: page === currentPage}" :key="page" class="page-item">
-          <a class="page-link" href="#">{{page}}</a>
-        </li>
-        <li @click="getProducts(currentPage+1)" class="page-item"  :class="{disabled: !hasNext}">
-          <a class="page-link" href="#">Next</a>
-        </li>
-      </ul>
-    </nav>
   </script>
-
+  <!-- 上傳圖片 template -->
   <script type="x-template" id="uploadImgModalCMP">
     <div id="uploadImgModal" class="modal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">
