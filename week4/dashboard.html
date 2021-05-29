@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="../css/vendor/bootstrap.min.css">
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css' integrity='sha512-q3eWabyZPc1XTCmF+8/LuE1ozpg5xxn7iO89yfSOd5/oKvyqLngoNGsx8jq92Y8eXJ/IRxQbEC+FGSYxtk2oiw==' crossorigin='anonymous'/>
+</head>
+<body>
+  <div id="app">
+    <div class="py-2 bg-light d-flex">
+      <h3 class="h5">後臺管理</h3>
+      <button class="btn btn-link ml-auto">登出</button>
+    </div>
+    <div class="wrap p-5">
+      <div class="text-right">
+        <button @click="modalHandler('add')" type="button" class="btn btn-sm btn-primary my-3">建立新產品</button>
+      </div>      
+      <table class="table mb-3 ">
+        <thead>
+          <tr>
+            <th width="150">分類</th>
+            <th>產品名稱</th>
+            <th width="100">原價</th>
+            <th width="100">售價</th>
+            <th width="150">是否啟用</th>
+            <th width="150">編輯</th>
+          </tr>
+        </thead>
+        <tbody class="productList">
+          <template v-if="products.length > 0">
+            <tr v-for="product in products" :key="product.id">
+              <td>{{product.category}}</td>
+              <td>{{product.title}}</td>
+              <td class="text-right">{{product.origin_price}}</td>
+              <td class="text-right">{{product.price}}</td>
+              <td>
+                <div class="custom-control custom-switch">
+                  <!-- 注意這邊需要用 checked = =... -->
+                  <input 
+                    :checked = "product.is_enabled"
+                    @change = "enableProduct(product.id)"
+                    type="checkbox"  class="custom-control-input"
+                    :id=`customSwitch${product.id}`>
+                  <label class="custom-control-label" :class="{'text-success': product.is_enabled }" :for="`customSwitch${ product.id }`">{{product.is_enabled ? "啟用" : "未啟用"}}</label>
+                </div>
+              </td>
+              <td>
+                <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
+                  <button type="button" @click="modalHandler('edit', product)" class="btn btn-outline-primary">編輯</button>
+                  <button type="button" @click="modalHandler('delete', product)" class="btn btn-outline-danger">刪除</button>
+                </div>
+              </td>
+            </tr>
+          </template>
+          <tr v-else>
+            <td class="text-center" colspan="100">目前沒有產品唷!!!</td>
+          </tr>
+        </tbody>
+      </table>
+      <pagination 
+        
+        :current-page="pagination.current_page"
+        :total-pages = "pagination.total_pages"      
+        :has-pre="pagination.has_pre"
+        :has-next = "pagination.has_next"      
+        @e_get-products = "getProducts"
+        class="d-flex justify-content-center"
+      ></pagination>
+      <p>目前有 <span class="leftProduct">{{products.length}}</span> 項商品</p>
+    </div>
+
+    <!-- modal 新增 編輯 -->
+    <div id="addEditModal" class="modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">{{modalType === 'add' ? '新增' : '編輯'}}產品</h5>
+            <button @click="cancelModal" type="button" class="close" >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="container-fluid">
+              <form id="productForm">
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="form-group my-2">
+                      <label for="#mainImg">主要圖片</label>
+                      <input v-model.lazy="tempProduct.imageUrl" type="text" class="form-control mb-3" id="mainImg" placeholder="輸入主圖網址">
+                      <img class="img-fluid" :src="tempProduct.imageUrl" alt="圖片">
+                    </div>
+  
+                    <template v-if="tempProduct.imagesUrl?.length > 0">
+                      <div class="form-group my-2">
+                        <h6 class="h6">次要圖片</h6>
+                      </div>
+                      <div  class="form-row">
+                        <div v-for="(temp,i) in tempProduct.imagesUrl" class="col-md-6 mb-5" :key="i">
+                          <label :for=`#image${i+1}`>輸入圖片網址 {{i+1}}</label>
+                          <!-- 指向問題用 temp 會改不到原本的 -->
+                          <input v-model="tempProduct.imagesUrl[i]" type="text" 
+                                :id=`image${i+1}` class="form-control mb-3" :placeholder=`輸入圖片網址${i+1}`>
+                          <div>
+                            <img class="img-fluid" :src="temp" alt="圖片">
+                          </div>
+                        </div>
+                      </div>
+                    </template>
+                    <hr>
+                    <div class="form-group my-2">
+                      <h6 class="h6">多圖新增</h6>
+                      <button @click="addTempImage" type="button" class="btn btn-sm btn-outline-primary btn-block mb-2"> 新增圖片 </button>
+                      <div class="mb-5">
+                        <input v-model.lazy.trim="newTempImageUrl" type="text" class="form-control form-control-sm mb-3" placeholder="新增圖片網址">
+                        <div>
+                          <img class="img-fluid" :src="newTempImageUrl" alt="新增圖片">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-8">
+                      <div class="form-group mb-2">
+                        <!-- title(String)、category(String)、unit(String)、origin_price(Number)、price(Number) 為必填欄位 -->
+                        <label for="title">
+                          <span class="text-danger">*</span>
+                          標題
+                        </label>
+                        <input v-model="tempProduct.title" type="text" class="form-control" id="title" placeholder="標題">
+                      </div>
+                      <div class="form-row mb-2">
+                        <div class="form-group col-md-6">
+                          <label for="category">
+                            <span class="text-danger">*</span>
+                            分類
+                          </label>
+                          <input v-model="tempProduct.category" type="text" class="form-control" id="category"  placeholder="分類">
+                        </div>
+                        <div class="form-group col-md-6">
+                          <label for="unit">
+                            <span class="text-danger">*</span>
+                            單位
+                          </label>
+                          <input v-model="tempProduct.unit" type="text" class="form-control"  id="unit" placeholder="單位">
+                        </div>
+                      </div>
+                      <div class="form-row mb-2">
+                        <div class="form-group col-md-6">
+                          <label for="price">
+                            <span class="text-danger">*</span>
+                            原價
+                          </label>
+                          <input v-model.number="tempProduct.origin_price" type="number" class="form-control"  id="origin_price" placeholder="原價">
+                        </div>
+                        <div class="form-group col-md-6">
+                          <span class="text-danger">*</span>
+                          <label for="price">售價</label>
+                          <input v-model.number="tempProduct.price" type="number" class="form-control" id="price" placeholder="售價">
+                        </div>
+                      </div>
+                      <div class="form-group mb-2">
+                        <label for="description">
+                          產品描述
+                        </label>
+                        <textarea v-model="tempProduct.description" class="form-control"  id="description" placeholder="描述"></textarea>
+                      </div>
+                      <div class="form-group mb-2">
+                        <label for="content">
+                          說明內容
+                        </label>
+                        <textarea v-model="tempProduct.content" class="form-control"  id="content" placeholder="說明"></textarea>
+                      </div>
+                      <div class="form-group form-check">
+                        <input v-model="tempProduct.is_enabled" type="checkbox"  class="form-check-input" id="productFormChecked">
+                        <label class="form-check-label" for="productFormChecked">是否啟用</label>
+                      </div>
+                  </div>
+        
+                </div>
+              </form>
+    
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button @click="cancelModal" type="button" class="btn btn-sm btn-secondary">取消</button>
+            <button @click="sendProduct" type="button" class="btn btn-sm btn-primary">確定</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- modal 刪除 -->
+    <div id="deleteModal" class="modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header bg-danger">
+            <h5 class="modal-title">刪除產品</h5>
+            <button @click="cancelModal" type="button" class="close" >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <h3 class="h3">是否要<span class="strong">刪除</span>商品??</h3>
+          </div>
+          <div class="modal-footer">
+            <button @click="deleteProduct" type="button" class="btn btn-danger">確定刪除</button>
+            <button @click="cancelModal" type="button" class="btn btn-sm btn-secondary">取消</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js' integrity='sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==' crossorigin='anonymous'></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/vue@next"></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.9.1/axios.min.js' integrity='sha512-Xk3wWei2TGrsh9kDSBKUMIjw/86sLUvhtnv9f7fOuIwhhiUTKz8szkWkzHthrM5Bb3Bu9idSzkxOrkzhcneuiw==' crossorigin='anonymous'></script>
+  <script type="x-template" id="pagination">
+    <nav>
+      <ul class="pagination">
+        <li @click="getProducts(currentPage-1)" class="page-item " :class="{disabled: !hasPre}">
+          <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+        </li>
+        <li @click="getProducts(page)" v-for="page in totalPages" :class="{active: page === currentPage}" :key="page" class="page-item">
+          <a class="page-link" href="#">{{page}}</a>
+        </li>
+        <li @click="getProducts(currentPage+1)" class="page-item"  :class="{disabled: !hasNext}">
+          <a class="page-link" href="#">Next</a>
+        </li>
+      </ul>
+    </nav>
+  </script>
+  <script src='./js/all.js'></script>
+</body>
+</html>
