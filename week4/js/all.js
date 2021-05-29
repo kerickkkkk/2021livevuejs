@@ -24,8 +24,8 @@ const app = {
   },
   methods:{
     checkLogin(){
-      if(document.cookie !== ''){
-        const token = document.cookie.replace(/(?:(?:^|.*;\s*)shop\s*=\s*([^;]*).*$)|^.*$/, '$1');
+      const token = document.cookie.replace(/(?:(?:^|.*;\s*)shop\s*=\s*([^;]*).*$)|^.*$/, '$1');
+      if(token !== ''){
         axios.defaults.headers.common['Authorization'] = token;
         axios.post(`${this.apiUrl}/api/user/check`)
         .then((res)=>{
@@ -40,7 +40,6 @@ const app = {
       }else{
         alert('沒有登入狀態 將導回登入頁面')
         location.replace('./index.html')
-        return false;
       }
     },
     //　取得產品
@@ -163,6 +162,8 @@ const app = {
         $('#deleteModal').modal('show')
         this.tempProduct = {...product}
         this.modalType = type
+      }else if(type === 'uploadImg'){
+        $('#uploadImgModal').modal('show');
       }else{
         console.log('沒有這個type');
       }
@@ -208,6 +209,57 @@ Vue.createApp(app)
       methods:{
         getProducts(page){
           this.$emit('e_getProducts',page)
+        }
+      }
+    })
+    .component('uploadImgModal',{
+      template:'#uploadImgModalCMP',
+      props:{
+        apiUrl:{
+          type: String,
+        },
+        apiPath:{
+          type: String,
+        },
+      },
+      data(){
+        return{
+          tempFile:null,
+          imageUrl:''
+        }
+      },
+      methods:{
+        fileHandler(){
+          this.tempFile = this.$refs.file.files[0];
+          console.log( this.tempFile );
+        },
+        fileUploadHandler(){
+          console.log(this.tempFile);
+          const url = `${this.apiUrl}/api/${this.apiPath}/admin/upload/`;
+          let formData = new FormData();
+          formData.append('file-to-upload',this.tempFile);
+    
+          // action="/api/thisismycourse2/admin/upload" enctype="multipart/form-data" 
+          // method="post"
+          // 擺了反而過不了
+          // const config = {
+          //   headers: {
+          //       'content-type': 'multipart/form-data'
+          //     }
+          // }
+          // enctype="multipart/form-data" 
+          // axios.post(url,formData,config)
+    
+          axios.post(url,formData)
+            .then((res)=>{
+              if(res.data.success){
+                this.imageUrl = res.data.imageUrl
+              }else{
+                alert(res.data.message)
+              }
+            }).catch((error)=>{
+              console.log(error);
+            })
         }
       }
     })

@@ -59,8 +59,10 @@
             })
         },
         checklogin(){
-          if(document.cookie !== ''){
+          // if(document.cookie !== ''){
             const token = document.cookie.replace(/(?:(?:^|.*;\s*)shop\s*=\s*([^;]*).*$)|^.*$/, '$1');
+            if(token === '') { return false; }
+            
             axios.defaults.headers.common['Authorization'] = token;
             axios.post(`${this.apiUrl}/api/user/check`)
             .then((res)=>{
@@ -73,9 +75,7 @@
             }).catch((error)=>{
               console.log(error);
             })
-          }else{
-            return false;
-          }
+
         }
       },
       created(){

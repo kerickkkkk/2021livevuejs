@@ -16,6 +16,7 @@
     </div>
     <div class="wrap p-5">
       <div class="text-right">
+        <button @click="modalHandler('uploadImg')" type="button" class="btn btn-sm btn-primary mr-3 my-3">上傳圖片</button>
         <button @click="modalHandler('add')" type="button" class="btn btn-sm btn-primary my-3">建立新產品</button>
       </div>      
       <table class="table mb-3 ">
@@ -211,6 +212,9 @@
         </div>
       </div>
     </div>
+    <!-- modal upload img -->
+    <upload-img-modal :api-url = 'apiUrl' :api-path='apiPath'></upload-img-modal>
+
   </div>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js' integrity='sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==' crossorigin='anonymous'></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns" crossorigin="anonymous"></script>
@@ -230,6 +234,37 @@
         </li>
       </ul>
     </nav>
+  </script>
+
+  <script type="x-template" id="uploadImgModalCMP">
+    <div id="uploadImgModal" class="modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <form @submit.prevent="fileUploadHandler" >
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">上傳圖片</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                <input ref="file" @change="fileHandler" type="file" name="file-to-upload" class="form-control" >
+              </div>
+              <p>取得連結</p>
+              <div class="form-group">
+                <input type="text" v-model="imageUrl" class="form-control">
+              </div>
+              <img :src="imageUrl" alt="預覽圖片" class="img-fluid">
+            </div>
+            <div class="modal-footer">
+              <input class="btn btn-sm btn-primary" type="submit" value="上傳圖片並取得連結">
+              <button type="button" class="btn  btn-sm btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </form> 
+      </div>
+    </div>
   </script>
   <script src='./js/all.js'></script>
 </body>
