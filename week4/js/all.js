@@ -1,5 +1,5 @@
 console.clear();
-
+const reader = new FileReader();
 const app = {
   data(){
     return {
@@ -263,56 +263,71 @@ Vue.createApp(app)
         },
       }
     })
-    .component('uploadImgModal',{
-      template:'#uploadImgModalCMP',
-      props:{
-        apiUrl:{
-          type: String,
-        },
-        apiPath:{
-          type: String,
-        },
+  .component('uploadImgModal',{
+    template:'#uploadImgModalCMP',
+    props:{
+      apiUrl:{
+        type: String,
       },
-      data(){
-        return{
-          tempFile:null,
-          imageUrl:''
-        }
+      apiPath:{
+        type: String,
       },
-      methods:{
-        fileHandler(){
-          this.tempFile = this.$refs.file.files[0];
-          console.log( this.tempFile );
-        },
-        fileUploadHandler(){
-          console.log(this.tempFile);
-          const url = `${this.apiUrl}/api/${this.apiPath}/admin/upload/`;
-          let formData = new FormData();
-          formData.append('file-to-upload',this.tempFile);
-    
-          // action="/api/thisismycourse2/admin/upload" enctype="multipart/form-data" 
-          // method="post"
-          // 擺了反而過不了
-          // const config = {
-          //   headers: {
-          //       'content-type': 'multipart/form-data'
-          //     }
-          // }
-          // enctype="multipart/form-data" 
-          // axios.post(url,formData,config)
-    
-          axios.post(url,formData)
-            .then((res)=>{
-              if(res.data.success){
-                this.imageUrl = res.data.imageUrl
-              }else{
-                alert(res.data.message)
-              }
-            }).catch((error)=>{
-              console.log(error);
-            })
-        }
+    },
+    data(){
+      return{
+        preViewImgUrl:'',
+        tempFile:null,
+        imageUrl:'',
       }
-    })
+    },
+    methods:{
+      fileHandler(){
+        this.tempFile = this.$refs.file.files[0];
+        reader.readAsDataURL(this.$refs.file.files[0])
+      },
+      fileOnLoadHandler(e){
+        this.preViewImgUrl = e.target.result;
+      },
+      fileUploadHandler(){
+        if(!this.tempFile) {
+          alert('請先選擇檔案');
+          return false;
+        }
+        const url = `${this.apiUrl}/api/${this.apiPath}/admin/upload/`;
+        let formData = new FormData();
+        formData.append('file-to-upload',this.tempFile);
+  
+        // action="/api/thisismycourse2/admin/upload" enctype="multipart/form-data" 
+        // method="post"
+        // 擺了反而過不了
+        // const config = {
+        //   headers: {
+        //       'content-type': 'multipart/form-data'
+        //     }
+        // }
+        // enctype="multipart/form-data" 
+        // axios.post(url,formData,config)
+  
+        axios.post(url,formData)
+          .then((res)=>{
+            if(res.data.success){
+              this.imageUrl = res.data.imageUrl
+            }else{
+              alert(res.data.message)
+            }
+          }).catch((error)=>{
+            console.log(error);
+          })
+      },
+      copyImgUrl(){
+        // 選擇該位子 並且複製
+        this.$refs.uploadImgInput.select();
+        document.execCommand("copy");
+      },
+    },
+    mounted(){
+      reader.addEventListener('load',this.fileOnLoadHandler)
+    }
+  })
   .mount('#app');
 

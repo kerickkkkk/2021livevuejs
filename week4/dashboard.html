@@ -274,6 +274,9 @@
               <div class="form-group">
                 <input ref="file" @change="fileHandler" type="file" name="file-to-upload" class="form-control" >
               </div>
+              <div>
+                <img :src="preViewImgUrl" alt="預覽上傳圖片"  class="img-fluid">
+              </div>
               <div class="d-flex justify-content-between">
                 <p>上傳圖片後的連結</p>
                 <div>
