@@ -44,7 +44,7 @@
                     :checked = "product.is_enabled"
                     @change = "enableProduct(product.id)"
                     type="checkbox"  class="custom-control-input"
-                    :id=`customSwitch${product.id}`>
+                    :id="`customSwitch${product.id}`">
                   <label class="custom-control-label" :class="{'text-success': product.is_enabled }" :for="`customSwitch${ product.id }`">{{product.is_enabled ? "啟用" : "未啟用"}}</label>
                 </div>
               </td>
@@ -143,10 +143,10 @@
                       </div>
                       <div  class="form-row">
                         <div v-for="(temp,i) in tempProduct.imagesUrl" class="col-md-6 mb-5" :key="i">
-                          <label :for=`#image${i+1}`>輸入圖片網址 {{i+1}}</label>
+                          <label :for="'#image' + (i+1)">輸入圖片網址 {{i+1}}</label>
                           <!-- 指向問題用 temp 會改不到原本的 -->
                           <input v-model="tempProduct.imagesUrl[i]" type="text" 
-                                :id=`image${i+1}` class="form-control mb-3" :placeholder=`輸入圖片網址${i+1}`>
+                                :id="'image'+(i+1)" class="form-control mb-3" :placeholder="'輸入圖片網址'+(i+1)">
                           <div>
                             <img class="img-fluid" :src="temp" alt="圖片">
                           </div>
@@ -274,9 +274,14 @@
               <div class="form-group">
                 <input ref="file" @change="fileHandler" type="file" name="file-to-upload" class="form-control" >
               </div>
-              <p>取得連結</p>
+              <div class="d-flex justify-content-between">
+                <p>上傳圖片後的連結</p>
+                <div>
+                  <button @click="copyImgUrl" class="btn btn-sm btn-outline-primary">複製取得連結</button>
+                </div>
+              </div>
               <div class="form-group">
-                <input type="text" v-model="imageUrl" class="form-control">
+                <input ref="uploadImgInput" type="text" v-model="imageUrl" class="form-control">
               </div>
               <img :src="imageUrl" alt="預覽圖片" class="img-fluid">
             </div>
