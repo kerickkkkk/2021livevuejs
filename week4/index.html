@@ -51,6 +51,7 @@
                 console.log(expired,token);
                 // 寫入 cookie
                 document.cookie = `shop=${token}; expires=${new Date(expired)}`;
+                console.log(document.cookie);
                 location.replace('./dashboard.html')
               }else{
                 alert(res.data.message)
