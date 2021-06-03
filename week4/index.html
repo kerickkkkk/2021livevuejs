@@ -52,7 +52,9 @@
                 // 寫入 cookie
                 document.cookie = `shop=${token}; expires=${new Date(expired)}`;
                 console.log(document.cookie);
-                location.replace('./dashboard.html')
+                setTimeout(() => {
+                  location.replace('./dashboard.html')
+                }, 1000);
               }else{
                 alert(res.data.message)
               }
