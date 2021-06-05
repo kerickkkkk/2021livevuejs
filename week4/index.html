@@ -53,7 +53,7 @@
                 document.cookie = `shop=${token}; expires=${new Date(expired)}`;
                 console.log(document.cookie);
                 setTimeout(() => {
-                  location.replace('./dashboard.html')
+                  // location.replace('./dashboard.html')
                 }, 1000);
               }else{
                 alert(res.data.message)
