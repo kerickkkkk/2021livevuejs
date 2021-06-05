@@ -182,10 +182,8 @@ const app = {
     },
   },
   created(){
-    // this.checkLogin()
+    this.checkLogin()
     // this.getProducts();
-    document.cookie=`shop=${token}; expires=${new Date(expired)}`;
-    console.log(document.cookie);
   }
 
 }
