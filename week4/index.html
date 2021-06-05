@@ -48,13 +48,9 @@
           axios.post(`${this.apiUrl}/admin/signin`,this.user).then((res) => {
               if(res.data.success){
                 const{expired,token} = res.data;
-                console.log(expired,token);
                 // 寫入 cookie
                 document.cookie = `shop=${token}; expires=${new Date(expired)}`;
-                console.log(document.cookie);
-                setTimeout(() => {
-                  // location.replace('./dashboard.html')
-                }, 1000);
+                  location.replace('./dashboard.html')
               }else{
                 alert(res.data.message)
               }
