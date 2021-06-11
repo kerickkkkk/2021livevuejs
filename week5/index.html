@@ -11,6 +11,12 @@
       integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x"
       crossorigin="anonymous"
     />
+    <style>
+      .bg-cover{
+        background-position: center center;
+        background-size: cover;
+      }
+    </style>
   </head>
   <body>
     <div id="app">
@@ -41,7 +47,7 @@
                 </div>
                 <div class="d-flex justify-content-center">
                   <button
-                    @click="openProductDetailModal"
+                    @click="getProductDetail(item.id)"
                     class="btn btn-outline-primary me-3"
                     type="button"
                   >
@@ -147,7 +153,7 @@
         </div>
       </div>
       <!-- productDetailModal -->
-      <product-detail-modal ref="productDetail"></product-detail-modal>
+      <product-detail-modal @add-cart="addCart" :product = "tempProductDetail" ref="productDetail"></product-detail-modal>
     </div>
 
     <script
@@ -182,7 +188,7 @@
         <div class="modal-dialog modal-lg">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title">Modal title</h5>
+              <h5 class="modal-title">產品詳細</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -190,13 +196,13 @@
                 <div class="row mb-3">
                   <div class="col-md-6">
                     <div class="slide__main p-3">
-                      <div class="bg-cover img-fluid" style="min-height: 350px ;background-image: url(https://images.unsplash.com/photo-1623246157877-3e901185826e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80" alt=""></div>
+                      <div class="bg-cover img-fluid" :style = "`background-image: url(${watchProduct.imageUrl})`" style="min-height: 350px ;" alt="watchProduct.title"></div>
               
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="d-flex flex-column justify-content-between h-100">
-                      <h1 class="p-3"># 手工拉麵 </h1>
+                      <h1 class="p-3">#{{watchProduct.title}} </h1>
                       <!-- <div class="d-flex mb-3">
                         <div class="me-3">口味:</div>
                         <div class="me-3"><button class="btn btn-sm btn-primary">青</button></div>
@@ -208,16 +214,16 @@
                       <div class="d-flex mb-3 align-items-center">
                         <div class="me-2">數量:</div>
                         <div class="btn-group me-3" role="group" aria-label="Basic checkbox toggle button group">
-                          <button type="button" class="btn btn-primary">+</button>
-                          <input type="number" min=1 class="form-control rounded-0" style="width:80px">
-                          <button type="button" class="btn btn-primary">-</button>
+                          <button @click="numCountHandler('pluse')" type="button" class="btn btn-primary">+</button>
+                          <input v-model.number="numRangeLimit" type="number" min=1 class="form-control rounded-0" style="width:80px">
+                          <button  @click="numCountHandler('minus')" type="button" class="btn btn-primary">-</button>
               
                         </div>
-                        個
+                        {{watchProduct.unit}}
                       </div>
                       <div class="d-flex justify-content-cnter">
-                        <div class="btn btn-lg btn-primary me-3">+ 立即結帳</div>
-                        <div class="btn btn-lg btn-primary">+ 加入購物車</div>
+                        <!-- <div class="btn btn-lg btn-primary me-3">+ 立即結帳</div> -->
+                        <div @click="addCart" class="btn btn-lg btn-primary">+ 加入購物車</div>
                       </div>
                     </div>
               
@@ -236,14 +242,21 @@
                     </li>
                   </ul>
                   <div class="tab-content" id="pills-tabContent">
-                    <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">123123123123123123</div>
-                    <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">3232</div>
-                    <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">123</div>
+                    <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+                      {{watchProduct.description}}
+                    </div>
+                    <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+                      {{watchProduct.content}}
+                    </div>
+                    <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
+                      購買流程 ... 
+                    </div>
                   </div>
               
                 </div>
               
               </div>
+            </div>
 
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -266,9 +279,27 @@
             },
             products: null,
             pagination: null,
+            tempProductDetail: {},
           };
         },
         methods: {
+          getProductDetail(id){
+            this.loadingStatus.itemLoading = id;
+            axios
+              .get(`${apiUrl}/api/${apiPath}/product/${id}`)
+              .then((res) => {
+                this.loadingStatus.itemLoading = null;
+                if (res.data.success) {
+                  this.tempProductDetail = res.data.product;
+                  this.openProductDetailModal()
+                } else {
+                  alert(res.data.message);
+                }
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          },
           openProductDetailModal() {
             this.$refs.productDetail.openModal();
           },
@@ -320,15 +351,45 @@
         })
         .component("productDetailModal", {
           template: '#productDetailTemplate',
+          props:{
+            product:{
+              type: Object,
+
+            }
+          },
           data() {
             return {
               modal: "",
+              num: 1,
+              watchProduct:{}
             };
           },
+          computed:{
+            // 產品 num 基數 不是 1 怪怪的 再修正
+            numRangeLimit:{
+              get(){
+                return this.watchProduct.num
+              },
+              set(val){
+                this.watchProduct.num =  val < 1 ? 1 : val >=999 ? 999 : val
+              }
+            }
+          },
           methods: {
+            addCart(){
+              this.$emit('add-cart',  this.watchProduct.id, this.watchProduct.num)
+            },
+            numCountHandler(type){
+              this.numRangeLimit = type === 'pluse' ? ++this.numRangeLimit : --this.numRangeLimit 
+            },
             openModal() {
               this.modal.show();
             },
+          },
+          watch:{
+            product(){
+              this.watchProduct = this.product
+            }
           },
           mounted() {
             this.modal = new bootstrap.Modal(this.$refs.modal);
