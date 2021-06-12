@@ -153,7 +153,7 @@
         </div>
       </div>
       <!-- productDetailModal -->
-      <product-detail-modal @add-cart="addCart" :product = "tempProductDetail" ref="productDetail"></product-detail-modal>
+      <product-detail-modal @add-cart="addCart" :product = "tempProductDetail" @clear-temp-product-detail="clearTempProductDetail" ref="productDetail"></product-detail-modal>
     </div>
 
     <script
@@ -188,8 +188,8 @@
         <div class="modal-dialog modal-lg">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title">產品詳細</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <h5 class="modal-title">{{watchProduct.title}}產品詳細</h5>
+              <button @click="closeModal" type="button" class="btn-close" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <div class="container">
@@ -258,10 +258,10 @@
               </div>
             </div>
 
-            <div class="modal-footer">
+            <!-- <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
               <button type="button" class="btn btn-primary">Save changes</button>
-            </div>
+            </div> -->
           </div>
         </div>
       </div>
@@ -283,6 +283,9 @@
           };
         },
         methods: {
+          clearTempProductDetail(){
+            this.tempProductDetail = {}
+          },
           getProductDetail(id){
             this.loadingStatus.itemLoading = id;
             axios
@@ -384,6 +387,10 @@
             },
             openModal() {
               this.modal.show();
+            },
+            closeModal() {
+              this.modal.hide();
+              this.$emit('clearTempProductDetail')
             },
           },
           watch:{
