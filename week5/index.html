@@ -12,7 +12,7 @@
       crossorigin="anonymous"
     />
     <style>
-      .bg-cover{
+      .bg-cover {
         background-position: center center;
         background-size: cover;
       }
@@ -90,7 +90,7 @@
         <!-- 購物車區塊 -->
         <div class="row">
           <div class="text-end">
-            <button class="btn btn-sm btn-outline-danger">清空購物車</button>
+            <button @click="deleteAllCart" class="btn btn-sm btn-outline-danger">清空購物車</button>
           </div>
           <table class="table">
             <thead>
@@ -107,8 +107,12 @@
                 <th>
                   <div class="cart__title d-flex">
                     <div class="me-3">
-                      <img :src="cart.product.imageUrl" :alt="cart.product.title" width="50" class="img-fluid">
-        
+                      <img
+                        :src="cart.product.imageUrl"
+                        :alt="cart.product.title"
+                        width="50"
+                        class="img-fluid"
+                      />
                     </div>
                     <div class="cart__title__content">
                       <div class="h6">{{cart.product.title}}</div>
@@ -118,17 +122,48 @@
                 </th>
                 <td class="text-end">NT ${{cart.product.price}}</td>
                 <td>
-                  <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
-                    <button type="button" class="btn btn-primary">+</button>
-                    <input v-model="cart.qty" type="number" min=1 class="form-control rounded-0" style="width:80px">
-        
-                    <button type="button" class="btn btn-primary">-</button>
-        
+                  <div
+                    class="btn-group"
+                    role="group"
+                    aria-label="Basic checkbox toggle button group"
+                  >
+                    <button
+                      :disabled="currentCartId === cart.id"
+                      @click="cartHandler('put', cart.id , cart.product.id , ++cart.qty)"
+                      type="button"
+                      class="btn btn-primary"
+                    >
+                      +
+                    </button>
+
+                    <input
+                      :disabled ="currentCartId === cart.id"
+                      @change="cartHandler('put', cart.id , cart.product.id , ++cart.qty)"
+                      v-model="cart.qty"
+                      type="number"
+                      min="1"
+                      class="form-control rounded-0"
+                      style="width: 80px"
+                    />
+
+                    <button
+                      :disabled="currentCartId === cart.id"
+                      @click="cartHandler('put', cart.id , cart.product.id , --cart.qty)"
+                      type="button"
+                      class="btn btn-primary"
+                    >
+                      -
+                    </button>
                   </div>
                 </td>
                 <td class="text-end">NT ${{cart.final_total}}</td>
                 <td>
-                  <button @click="deleteCart(cart.id)" class="btn btn-sm btn-outline-danger">刪除</button>
+                  <button
+                    @click="cartHandler('delete', cart.id)"
+                    class="btn btn-sm btn-outline-danger"
+                  >
+                    刪除
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -180,7 +215,12 @@
         </div>
       </div>
       <!-- productDetailModal -->
-      <product-detail-modal @add-cart="addCart" :product = "tempProductDetail" @clear-temp-product-detail="clearTempProductDetail" ref="productDetail"></product-detail-modal>
+      <product-detail-modal
+        @add-cart="addCart"
+        :product="tempProductDetail"
+        @clear-temp-product-detail="clearTempProductDetail"
+        ref="productDetail"
+      ></product-detail-modal>
     </div>
 
     <script
@@ -224,7 +264,7 @@
                   <div class="col-md-6">
                     <div class="slide__main p-3">
                       <div class="bg-cover img-fluid" :style = "`background-image: url(${watchProduct.imageUrl})`" style="min-height: 350px ;" alt="watchProduct.title"></div>
-              
+
                     </div>
                   </div>
                   <div class="col-md-6">
@@ -244,7 +284,7 @@
                           <button @click="numCountHandler('pluse')" type="button" class="btn btn-primary">+</button>
                           <input v-model.number="numRangeLimit" type="number" min=1 class="form-control rounded-0" style="width:80px">
                           <button  @click="numCountHandler('minus')" type="button" class="btn btn-primary">-</button>
-              
+
                         </div>
                         {{watchProduct.unit}}
                       </div>
@@ -253,7 +293,7 @@
                         <div @click="addCart" class="btn btn-lg btn-primary">+ 加入購物車</div>
                       </div>
                     </div>
-              
+
                   </div>
                 </div>
                 <div class="row">
@@ -276,12 +316,12 @@
                       {{watchProduct.content}}
                     </div>
                     <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
-                      購買流程 ... 
+                      購買流程 ...
                     </div>
                   </div>
-              
+
                 </div>
-              
+
               </div>
             </div>
 
@@ -307,7 +347,8 @@
             products: null,
             pagination: null,
             tempProductDetail: {},
-            carts: {}
+            currentCartId : null,
+            carts: {},
           };
         },
         methods: {
@@ -327,15 +368,38 @@
                 console.log(error);
               });
           },
-          // 刪除單一購物車
-          deleteCart(id) {
+          // 刪除全部購物車
+          deleteAllCart() {
             axios
-              .delete(`${apiUrl}/api/${apiPath}/cart/${id}`)
+              .delete(`${apiUrl}/api/${apiPath}/carts`)
               .then((res) => {
                 if (res.data.success) {
                   alert(res.data.message)
+                  this.getCart()
+                } else {
+                  alert(res.data.message);
+                }
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          },
+          // 刪除單一購物車
+          cartHandler(type, id, product_id, qty) {
+            this.currentCartId = id
+            if(type === "put"){
+              qty =  qty < 1 ? 1 : qty > 999 ? 999 : qty ;
+            }
+            const data = type === "put" ? { product_id, qty } : null;
+            
+            axios[type](`${apiUrl}/api/${apiPath}/cart/${id}`, { data })
+              .then((res) => {
+                this.currentCartId = null
+                if (res.data.success) {
+                  alert(res.data.message);
                   this.getCart();
                 } else {
+                  this.currentCartId = null
                   alert(res.data.message);
                 }
               })
@@ -345,10 +409,10 @@
           },
           // 產品列表
 
-          clearTempProductDetail(){
-            this.tempProductDetail = {}
+          clearTempProductDetail() {
+            this.tempProductDetail = {};
           },
-          getProductDetail(id){
+          getProductDetail(id) {
             this.loadingStatus.itemLoading = id;
             axios
               .get(`${apiUrl}/api/${apiPath}/product/${id}`)
@@ -356,7 +420,7 @@
                 this.loadingStatus.itemLoading = null;
                 if (res.data.success) {
                   this.tempProductDetail = res.data.product;
-                  this.openProductDetailModal()
+                  this.openProductDetailModal();
                 } else {
                   alert(res.data.message);
                 }
@@ -377,6 +441,7 @@
                 this.loadingStatus.itemLoading = null;
                 if (res.data.success) {
                   alert(res.data.message);
+                  this.getCart();
                 } else {
                   alert(res.data.message);
                 }
@@ -416,50 +481,54 @@
           },
         })
         .component("productDetailModal", {
-          template: '#productDetailTemplate',
-          props:{
-            product:{
+          template: "#productDetailTemplate",
+          props: {
+            product: {
               type: Object,
-
-            }
+            },
           },
           data() {
             return {
               modal: "",
               num: 1,
-              watchProduct:{}
+              watchProduct: {},
             };
           },
-          computed:{
+          computed: {
             // 產品 num 基數 不是 1 怪怪的 再修正
-            numRangeLimit:{
-              get(){
-                return this.watchProduct.num
+            numRangeLimit: {
+              get() {
+                return this.watchProduct.num;
               },
-              set(val){
-                this.watchProduct.num =  val < 1 ? 1 : val >=999 ? 999 : val
-              }
-            }
+              set(val) {
+                this.watchProduct.num = val < 1 ? 1 : val >= 999 ? 999 : val;
+              },
+            },
           },
           methods: {
-            addCart(){
-              this.$emit('add-cart',  this.watchProduct.id, this.watchProduct.num)
+            addCart() {
+              this.$emit(
+                "add-cart",
+                this.watchProduct.id,
+                this.watchProduct.num
+              );
             },
-            numCountHandler(type){
-              this.numRangeLimit = type === 'pluse' ? ++this.numRangeLimit : --this.numRangeLimit 
+            numCountHandler(type) {
+              this.numRangeLimit =
+                type === "pluse" ? ++this.numRangeLimit : --this.numRangeLimit;
             },
             openModal() {
               this.modal.show();
             },
             closeModal() {
               this.modal.hide();
-              this.$emit('clearTempProductDetail')
+              this.$emit("clearTempProductDetail");
             },
           },
-          watch:{
-            product(){
-              this.watchProduct = this.product
-            }
+          watch: {
+            product() {
+              this.watchProduct = this.product;
+            },
           },
           mounted() {
             this.modal = new bootstrap.Modal(this.$refs.modal);
