@@ -89,34 +89,61 @@
         </template>
         <!-- 購物車區塊 -->
         <div class="row">
+          <div class="text-end">
+            <button class="btn btn-sm btn-outline-danger">清空購物車</button>
+          </div>
           <table class="table">
             <thead>
               <tr>
-                <th scope="col">#</th>
-                <th scope="col">First</th>
-                <th scope="col">Last</th>
-                <th scope="col">Handle</th>
+                <th scope="col">商品選項{{Object.keys(carts).length}}</th>
+                <th scope="col">單價</th>
+                <th scope="col">數量</th>
+                <th scope="col">小計</th>
+                <th scope="col">刪除</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <th scope="row">1</th>
-                <td>Mark</td>
-                <td>Otto</td>
-                <td>@mdo</td>
-              </tr>
-              <tr>
-                <th scope="row">2</th>
-                <td>Jacob</td>
-                <td>Thornton</td>
-                <td>@fat</td>
-              </tr>
-              <tr>
-                <th scope="row">3</th>
-                <td colspan="2">Larry the Bird</td>
-                <td>@twitter</td>
+              <tr v-for="cart in carts.carts" :key="cart.id">
+                <th>
+                  <div class="cart__title d-flex">
+                    <div class="me-3">
+                      <img :src="cart.product.imageUrl" :alt="cart.product.title" width="50" class="img-fluid">
+        
+                    </div>
+                    <div class="cart__title__content">
+                      <div class="h6">{{cart.product.title}}</div>
+                      <p>規格</p>
+                    </div>
+                  </div>
+                </th>
+                <td class="text-end">NT ${{cart.product.price}}</td>
+                <td>
+                  <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
+                    <button type="button" class="btn btn-primary">+</button>
+                    <input v-model="cart.qty" type="number" min=1 class="form-control rounded-0" style="width:80px">
+        
+                    <button type="button" class="btn btn-primary">-</button>
+        
+                  </div>
+                </td>
+                <td class="text-end">NT ${{cart.final_total}}</td>
+                <td>
+                  <button @click="deleteCart(cart.id)" class="btn btn-sm btn-outline-danger">刪除</button>
+                </td>
               </tr>
             </tbody>
+            <tfoot>
+              <tr>
+                <td class="text-end" colspan="100">
+                  原價 NT $ {{carts.total}}
+                </td>
+              </tr>
+              <tr>
+                <td class="text-end" colspan="100">
+                  總價 NT $ {{carts.final_total}}
+                </td>
+              </tr>
+            </tfoot>
           </table>
         </div>
         <!-- 驗證表單 -->
@@ -280,9 +307,44 @@
             products: null,
             pagination: null,
             tempProductDetail: {},
+            carts: {}
           };
         },
         methods: {
+          // 購物車區
+          getCart() {
+            axios
+              .get(`${apiUrl}/api/${apiPath}/cart`)
+              .then((res) => {
+                if (res.data.success) {
+                  const { data } = res.data;
+                  this.carts = data;
+                } else {
+                  alert(res.data.message);
+                }
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          },
+          // 刪除單一購物車
+          deleteCart(id) {
+            axios
+              .delete(`${apiUrl}/api/${apiPath}/cart/${id}`)
+              .then((res) => {
+                if (res.data.success) {
+                  alert(res.data.message)
+                  this.getCart();
+                } else {
+                  alert(res.data.message);
+                }
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          },
+          // 產品列表
+
           clearTempProductDetail(){
             this.tempProductDetail = {}
           },
@@ -342,6 +404,7 @@
         },
         mounted() {
           this.getProducts();
+          this.getCart();
         },
       })
         .component("card", {
