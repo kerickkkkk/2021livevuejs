@@ -21,8 +21,8 @@
   <body>
     <div id="app">
       <!-- loading -->
-      <loading :active="1"></loading>
-      
+      <loading :active="false"></loading>
+
       <!-- 產品區塊 -->
       <div class="container">
         <h3>產品區塊</h3>
@@ -90,133 +90,217 @@
             @get-products="getProducts"
           ></pagination>
         </template>
-        <!-- 購物車區塊 -->
+        <hr>
         <div class="row">
-          <div class="text-end">
-            <button @click="deleteAllCart" class="btn btn-sm btn-outline-danger">清空購物車</button>
+          <div class="col-md-7">
+            <!-- 購物車區塊 -->
+            <div class="row">
+              <div class="text-end">
+                <button
+                  @click="deleteAllCart"
+                  class="btn btn-sm btn-outline-danger"
+                >
+                  清空購物車
+                </button>
+              </div>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">商品選項{{Object.keys(carts).length}}</th>
+                    <th scope="col">單價</th>
+                    <th scope="col">數量</th>
+                    <th scope="col">小計</th>
+                    <th scope="col">刪除</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="cart in carts.carts" :key="cart.id">
+                    <th>
+                      <div class="cart__title d-flex">
+                        <div class="me-3">
+                          <img
+                            :src="cart.product.imageUrl"
+                            :alt="cart.product.title"
+                            width="50"
+                            class="img-fluid"
+                          />
+                        </div>
+                        <div class="cart__title__content">
+                          <div class="h6">{{cart.product.title}}</div>
+                          <p>規格</p>
+                        </div>
+                      </div>
+                    </th>
+                    <td class="text-end">NT ${{cart.product.price}}</td>
+                    <td>
+                      <div
+                        class="btn-group"
+                        role="group"
+                        aria-label="Basic checkbox toggle button group"
+                      >
+                        <button
+                          :disabled="currentCartId === cart.id"
+                          @click="cartHandler('put', cart.id , cart.product.id , ++cart.qty)"
+                          type="button"
+                          class="btn btn-primary"
+                        >
+                          +
+                        </button>
+
+                        <input
+                          :disabled="currentCartId === cart.id"
+                          @change="cartHandler('put', cart.id , cart.product.id , ++cart.qty)"
+                          v-model="cart.qty"
+                          type="number"
+                          min="1"
+                          class="form-control rounded-0"
+                          style="width: 80px"
+                        />
+
+                        <button
+                          :disabled="currentCartId === cart.id"
+                          @click="cartHandler('put', cart.id , cart.product.id , --cart.qty)"
+                          type="button"
+                          class="btn btn-primary"
+                        >
+                          -
+                        </button>
+                      </div>
+                    </td>
+                    <td class="text-end">NT ${{cart.final_total}}</td>
+                    <td>
+                      <button
+                        @click="cartHandler('delete', cart.id)"
+                        class="btn btn-sm btn-outline-danger"
+                      >
+                        刪除
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td class="text-end" colspan="100">
+                      原價 NT $ {{carts.total}}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-end" colspan="100">
+                      總價 NT $ {{carts.final_total}}
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
           </div>
-          <table class="table">
-            <thead>
-              <tr>
-                <th scope="col">商品選項{{Object.keys(carts).length}}</th>
-                <th scope="col">單價</th>
-                <th scope="col">數量</th>
-                <th scope="col">小計</th>
-                <th scope="col">刪除</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="cart in carts.carts" :key="cart.id">
-                <th>
-                  <div class="cart__title d-flex">
-                    <div class="me-3">
-                      <img
-                        :src="cart.product.imageUrl"
-                        :alt="cart.product.title"
-                        width="50"
-                        class="img-fluid"
-                      />
-                    </div>
-                    <div class="cart__title__content">
-                      <div class="h6">{{cart.product.title}}</div>
-                      <p>規格</p>
-                    </div>
-                  </div>
-                </th>
-                <td class="text-end">NT ${{cart.product.price}}</td>
-                <td>
-                  <div
-                    class="btn-group"
-                    role="group"
-                    aria-label="Basic checkbox toggle button group"
-                  >
-                    <button
-                      :disabled="currentCartId === cart.id"
-                      @click="cartHandler('put', cart.id , cart.product.id , ++cart.qty)"
-                      type="button"
-                      class="btn btn-primary"
-                    >
-                      +
-                    </button>
+          <div class="col-md-5">
+            <!-- 驗證區塊 -->
+            <!-- <v-form>
+              <v-field
+                id="email"
+                name="email"
+                type="email"
+                class="form-control"
+                :class="{ 'is-invalid': errors['email'] }"
+                placeholder="請輸入 Email"
+                rules="email|required"
+                v-model="user.email"
+              ></v-field>
+              <error-message name="email" class="invalid-feedback"></error-message>
+            </v-form> -->
+            <v-form @submit="onSubmit" v-slot="{ errors }">
+              <div class="mb-3">
+                <label for="name" class="form-label">姓名</label>
+                <v-field
+                  v-model="user.name"
+                  id="name"
+                  name="姓名"
+                  type="text"
+                  class="form-control"
+                  :class="{ 'is-invalid': errors['姓名'] }"
+                  placeholder="請輸入 姓名"
+                  rules="required"
+                ></v-field>
+                <error-message name="姓名" class="invalid-feedback"></error-message>
+              </div>
+              <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <v-field
+                  v-model="user.email"
+                  id="email"
+                  name="email"
+                  type="email"
+                  class="form-control"
+                  :class="{ 'is-invalid': errors['email'] }"
+                  placeholder="請輸入 Email"
+                  rules="email|required"
+                ></v-field>
+                <error-message name="email" class="invalid-feedback"></error-message>
+              </div>
 
-                    <input
-                      :disabled ="currentCartId === cart.id"
-                      @change="cartHandler('put', cart.id , cart.product.id , ++cart.qty)"
-                      v-model="cart.qty"
-                      type="number"
-                      min="1"
-                      class="form-control rounded-0"
-                      style="width: 80px"
-                    />
+              <div class="mb-3">
+                <label for="tel" class="form-label">電話</label>
+                <v-field
+                  v-model="user.tel"
+                  id="tel"
+                  name="電話"
+                  type="text"
+                  class="form-control"
+                  :class="{ 'is-invalid': errors['電話'] }"
+                  placeholder="請輸入 姓名"
+                  rules="required|min:8|max:10"
+                ></v-field>
+              <error-message name="電話" class="invalid-feedback"></error-message>
+              </div>
+              <div class="mb-3">
+                <label for="addr" class="form-label">地址</label>
+                <v-field
+                  v-model="user.addr"
+                  id="addr"
+                  name="地址"
+                  type="text"
+                  class="form-control"
+                  :class="{ 'is-invalid': errors['地址'] }"
+                  placeholder="請輸入 地址"
+                  rules="required"
+                ></v-field>
+                <error-message v-model="user.addr" name="地址" class="invalid-feedback"></error-message>
 
-                    <button
-                      :disabled="currentCartId === cart.id"
-                      @click="cartHandler('put', cart.id , cart.product.id , --cart.qty)"
-                      type="button"
-                      class="btn btn-primary"
-                    >
-                      -
-                    </button>
-                  </div>
-                </td>
-                <td class="text-end">NT ${{cart.final_total}}</td>
-                <td>
-                  <button
-                    @click="cartHandler('delete', cart.id)"
-                    class="btn btn-sm btn-outline-danger"
-                  >
-                    刪除
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr>
-                <td class="text-end" colspan="100">
-                  原價 NT $ {{carts.total}}
-                </td>
-              </tr>
-              <tr>
-                <td class="text-end" colspan="100">
-                  總價 NT $ {{carts.final_total}}
-                </td>
-              </tr>
-            </tfoot>
-          </table>
+              </div>
+              <div class="mb-3">
+                <label for="message" class="form-label">留言</label>
+                <textarea v-model="user.msg" class="form-control" id="message" placeholder="請輸入留言" aria-describedby="message"></textarea>
+              </div>
+              <button class="btn btn-primary" type="submit">送出訂單</button>
+            </v-form>
+            <!-- <form>
+              <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" aria-describedby="email">
+              </div>
+              <div class="mb-3">
+                <label for="name" class="form-label">收件人姓名</label>
+                <input type="text" class="form-control" id="name" aria-describedby="name">
+              </div>
+              <div class="mb-3">
+                <label for="tel" class="form-label">收件人電話</label>
+                <input type="number" class="form-control" id="tel" aria-describedby="tel">
+              </div>
+              <div class="mb-3">
+                <label for="addr" class="form-label">收件人地址</label>
+                <input type="text" class="form-control" id="addr" aria-describedby="addr">
+              </div>
+              <div class="mb-3">
+                <label for="message" class="form-label">留言</label>
+                <textarea class="form-control" id="message" aria-describedby="message"></textarea>
+              </div>
+              <input type="submit" class="btn btn-danger" value="送出訂單">
+            </form> -->
+
+
+          </div>
+          </div>
         </div>
-        <!-- 驗證表單 -->
-        <div class="row">
-          <table class="table">
-            <thead>
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">First</th>
-                <th scope="col">Last</th>
-                <th scope="col">Handle</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th scope="row">1</th>
-                <td>Mark</td>
-                <td>Otto</td>
-                <td>@mdo</td>
-              </tr>
-              <tr>
-                <th scope="row">2</th>
-                <td>Jacob</td>
-                <td>Thornton</td>
-                <td>@fat</td>
-              </tr>
-              <tr>
-                <th scope="row">3</th>
-                <td colspan="2">Larry the Bird</td>
-                <td>@twitter</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
       <!-- productDetailModal -->
       <product-detail-modal
         @add-cart="addCart"
@@ -241,7 +325,15 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
     <!-- Lastly add this package -->
     <script src="https://cdn.jsdelivr.net/npm/vue-loading-overlay@4"></script>
-    <link href="https://cdn.jsdelivr.net/npm/vue-loading-overlay@4/dist/vue-loading.css" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/vue-loading-overlay@4/dist/vue-loading.css"
+      rel="stylesheet"
+    />
+
+    <!-- validation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vee-validate/4.1.17/vee-validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@vee-validate/i18n@4.1.17/dist/vee-validate-i18n.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@vee-validate/rules@4.1.17/dist/vee-validate-rules.min.js"></script>
 
     <!-- 分頁  template -->
     <script type="x-template" id="pagination">
@@ -343,12 +435,29 @@
         </div>
       </div>
     </script>
+
     <script type="module">
       // 因無法引入 loading 改用 vue 直接引入
       // import { createApp } from "https://cdnjs.cloudflare.com/ajax/libs/vue/3.0.9/vue.esm-browser.js";
 
       // 可以直接看 vueLoading
       // console.log(VueLoading);
+
+      Object.keys(VeeValidateRules).forEach((rule) => {
+        if (rule !== "default") {
+          VeeValidate.defineRule(rule, VeeValidateRules[rule]);
+        }
+      });
+
+      VeeValidateI18n.loadLocaleFromURL(
+        "https://unpkg.com/@vee-validate/i18n@4.1.0/dist/locale/zh_TW.json"
+      );
+
+      // Activate the locale
+      VeeValidate.configure({
+        generateMessage: VeeValidateI18n.localize("zh_TW"),
+        validateOnInput: true, // 調整為輸入字元立即進行驗證
+      });
 
       const apiUrl = "https://vue3-course-api.hexschool.io";
       const apiPath = "pet";
@@ -362,8 +471,15 @@
             products: null,
             pagination: null,
             tempProductDetail: {},
-            currentCartId : null,
+            currentCartId: null,
             carts: {},
+            user:{
+              name:'',
+              email:'',
+              tel:'',
+              addr:'',
+              msg:'',
+            }
           };
         },
         methods: {
@@ -389,8 +505,8 @@
               .delete(`${apiUrl}/api/${apiPath}/carts`)
               .then((res) => {
                 if (res.data.success) {
-                  alert(res.data.message)
-                  this.getCart()
+                  alert(res.data.message);
+                  this.getCart();
                 } else {
                   alert(res.data.message);
                 }
@@ -401,20 +517,20 @@
           },
           // 刪除單一購物車
           cartHandler(type, id, product_id, qty) {
-            this.currentCartId = id
-            if(type === "put"){
-              qty =  qty < 1 ? 1 : qty > 999 ? 999 : qty ;
+            this.currentCartId = id;
+            if (type === "put") {
+              qty = qty < 1 ? 1 : qty > 999 ? 999 : qty;
             }
             const data = type === "put" ? { product_id, qty } : null;
-            
+
             axios[type](`${apiUrl}/api/${apiPath}/cart/${id}`, { data })
               .then((res) => {
-                this.currentCartId = null
+                this.currentCartId = null;
                 if (res.data.success) {
                   alert(res.data.message);
                   this.getCart();
                 } else {
-                  this.currentCartId = null
+                  this.currentCartId = null;
                   alert(res.data.message);
                 }
               })
@@ -481,6 +597,9 @@
                 console.log(error);
               });
           },
+          onSubmit(){
+            alert('submit');
+          }
         },
         mounted() {
           this.getProducts();
@@ -592,12 +711,17 @@
               this.$emit("get-products", page);
             },
           },
-        })
-        
-        app.use(VueLoading);
-        app.component('loading', VueLoading)
+        });
 
-        app.mount("#app");
+      // app.use(VueLoading);
+      app.component("loading", VueLoading);
+
+      // 註冊驗證元件
+      app.component("vForm", VeeValidate.Form);
+      app.component("vField", VeeValidate.Field);
+      app.component("errorMessage", VeeValidate.ErrorMessage);
+
+      app.mount("#app");
     </script>
   </body>
 </html>
