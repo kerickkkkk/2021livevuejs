@@ -20,6 +20,9 @@
   </head>
   <body>
     <div id="app">
+      <!-- loading -->
+      <loading :active="1"></loading>
+      
       <!-- 產品區塊 -->
       <div class="container">
         <h3>產品區塊</h3>
@@ -233,6 +236,13 @@
       integrity="sha512-Xk3wWei2TGrsh9kDSBKUMIjw/86sLUvhtnv9f7fOuIwhhiUTKz8szkWkzHthrM5Bb3Bu9idSzkxOrkzhcneuiw=="
       crossorigin="anonymous"
     ></script>
+
+    <!-- Vue js -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+    <!-- Lastly add this package -->
+    <script src="https://cdn.jsdelivr.net/npm/vue-loading-overlay@4"></script>
+    <link href="https://cdn.jsdelivr.net/npm/vue-loading-overlay@4/dist/vue-loading.css" rel="stylesheet">
+
     <!-- 分頁  template -->
     <script type="x-template" id="pagination">
       <nav>
@@ -334,11 +344,16 @@
       </div>
     </script>
     <script type="module">
-      import { createApp } from "https://cdnjs.cloudflare.com/ajax/libs/vue/3.0.9/vue.esm-browser.js";
+      // 因無法引入 loading 改用 vue 直接引入
+      // import { createApp } from "https://cdnjs.cloudflare.com/ajax/libs/vue/3.0.9/vue.esm-browser.js";
+
+      // 可以直接看 vueLoading
+      // console.log(VueLoading);
+
       const apiUrl = "https://vue3-course-api.hexschool.io";
       const apiPath = "pet";
 
-      createApp({
+      const app = Vue.createApp({
         data() {
           return {
             loadingStatus: {
@@ -578,7 +593,11 @@
             },
           },
         })
-        .mount("#app");
+        
+        app.use(VueLoading);
+        app.component('loading', VueLoading)
+
+        app.mount("#app");
     </script>
   </body>
 </html>
