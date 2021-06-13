@@ -21,7 +21,7 @@
   <body>
     <div id="app">
       <!-- loading -->
-      <loading :active="false"></loading>
+      <loading :active="loadingStatus.fullScreeningLoading"></loading>
 
       <!-- 產品區塊 -->
       <div class="container">
@@ -467,6 +467,7 @@
           return {
             loadingStatus: {
               itemLoading: null,
+              fullScreeningLoading: false,
             },
             products: null,
             pagination: null,
@@ -510,9 +511,11 @@
           },
           // 刪除全部購物車
           deleteAllCart() {
+            this.loadingStatus.fullScreeningLoading = true
             axios
               .delete(`${apiUrl}/api/${apiPath}/carts`)
               .then((res) => {
+                this.loadingStatus.fullScreeningLoading = false
                 if (res.data.success) {
                   alert(res.data.message);
                   this.getCart();
@@ -521,6 +524,7 @@
                 }
               })
               .catch((error) => {
+                this.loadingStatus.fullScreeningLoading = false
                 console.log(error);
               });
           },
@@ -531,9 +535,10 @@
               qty = qty < 1 ? 1 : qty > 999 ? 999 : qty;
             }
             const data = type === "put" ? { product_id, qty } : null;
-
+            this.loadingStatus.fullScreeningLoading = true
             axios[type](`${apiUrl}/api/${apiPath}/cart/${id}`, { data })
               .then((res) => {
+                this.loadingStatus.fullScreeningLoading = false
                 this.currentCartId = null;
                 if (res.data.success) {
                   alert(res.data.message);
@@ -544,6 +549,7 @@
                 }
               })
               .catch((error) => {
+                this.loadingStatus.fullScreeningLoading = false
                 console.log(error);
               });
           },
@@ -591,14 +597,17 @@
               });
           },
           getProducts(page = 1) {
+            this.loadingStatus.fullScreeningLoading = true
             axios
               .get(`${apiUrl}/api/${apiPath}/products?page=${page}`)
               .then((res) => {
+                this.loadingStatus.fullScreeningLoading = false
                 if (res.data.success) {
                   const { products, pagination } = res.data;
                   this.products = products;
                   this.pagination = pagination;
                 } else {
+                  this.loadingStatus.fullScreeningLoading = false
                   alert(res.data.message);
                 }
               })
@@ -618,10 +627,11 @@
                 message: this.user.msg,
               }
             }
-            console.log(data);
+            this.loadingStatus.fullScreeningLoading = true
             axios
               .post(`${apiUrl}/api/${apiPath}/order`,data)
               .then((res) => {
+                this.loadingStatus.fullScreeningLoading = false
                 if (res.data.success) {
                   const { message, total ,orderId} = res.data;
                   alert (`${message}, 共$${total}元, 訂單編號: ${orderId}`)
@@ -631,6 +641,7 @@
                 }
               })
               .catch((error) => {
+                this.loadingStatus.fullScreeningLoading = false
                 console.log(error);
               });
           },
