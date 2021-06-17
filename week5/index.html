@@ -106,7 +106,7 @@
               <table class="table">
                 <thead>
                   <tr>
-                    <th scope="col">商品選項{{Object.keys(carts).length}}</th>
+                    <th scope="col">商品選項</th>
                     <th scope="col">單價</th>
                     <th scope="col">數量</th>
                     <th scope="col">小計</th>
@@ -495,9 +495,11 @@
         methods: {
           // 購物車區
           getCart() {
+            this.loadingStatus.fullScreeningLoading = true
             axios
               .get(`${apiUrl}/api/${apiPath}/cart`)
               .then((res) => {
+                this.loadingStatus.fullScreeningLoading = false
                 if (res.data.success) {
                   const { data } = res.data;
                   this.carts = data;
@@ -506,7 +508,11 @@
                 }
               })
               .catch((error) => {
+                this.loadingStatus.fullScreeningLoading = false
                 console.log(error);
+              })
+              .finally(()=>{
+                this.$refs.openProductDetailModal ?. closeModal();
               });
           },
           // 刪除全部購物車
@@ -593,6 +599,7 @@
                 }
               })
               .catch((error) => {
+                this.loadingStatus.itemLoading = null;
                 console.log(error);
               });
           },
@@ -677,10 +684,10 @@
             // 產品 num 基數 不是 1 怪怪的 再修正
             numRangeLimit: {
               get() {
-                return this.watchProduct.num;
+                return this.num;
               },
               set(val) {
-                this.watchProduct.num = val < 1 ? 1 : val >= 999 ? 999 : val;
+                this.num = val < 1 ? 1 : val >= 999 ? 999 : val;
               },
             },
           },
@@ -689,8 +696,9 @@
               this.$emit(
                 "add-cart",
                 this.watchProduct.id,
-                this.watchProduct.num
+                this.num
               );
+              this.closeModal();
             },
             numCountHandler(type) {
               this.numRangeLimit =
